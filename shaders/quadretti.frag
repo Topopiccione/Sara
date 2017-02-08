@@ -12,8 +12,8 @@ vec2 mouse = vec2(0.5, 0.5);
 float timee = time * 0.001;
 void main( void ) {
 	vec3 pos = vec3(0,0,-8);
-	vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.x, 1.));
-	vec3 colour = vec3(.05,.1,.15) * gl_FragCoord.y / resolution.y;
+	vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.xy, 1.));
+	vec3 colour = vec3(.05,.1,.15);// * gl_FragCoord.y / resolution.y;
 	for (float y = 5.; y >= -5.; y--) {
 		for (float x = -5.; x <= 5.; x++) {
 			vec3 s = vec3(x+sin(timee+y*.7),sin(timee+x*.5+y*.5),y+sin(timee-x*.7));

@@ -23,6 +23,7 @@ static void key_callback( GLFWwindow* window, int key, int scancode, int action,
 		glfwSetWindowShouldClose( window, GLFW_TRUE );
 }
 
+
 int main( void ) {
 
 	glfwSetErrorCallback( error_callback );
@@ -32,24 +33,27 @@ int main( void ) {
 		return 1;
 	}
 	
-	SaraWindowManager wndMgr( 640, 480 );
+	SaraWindowManager wndMgr( global_xRes, global_yRes );
 	glfwMakeContextCurrent( wndMgr.getWndw() );
 	glfwSetKeyCallback( wndMgr.getWndw(), key_callback );
 
 	// start GLEW extension handler
 	glewExperimental = GL_TRUE;
-	glewInit();
+	GLenum err = glewInit();
+	if (GLEW_OK != err)
+		std::cout << "Errore glew init: " << glewGetErrorString( err ) << std::endl;
 
-	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\test.frag" ) );
-	//SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
+	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\modExp.frag" ) );
+	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\quadretti.frag" ) );
+	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\superstructure.frag" ) );
+	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
-	//SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader );
-	SaraRenderer mainRenderer( &wndMgr, &mainShader, nullptr );
+	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader );
 	
-	/* LOOP */
+	// LOOP
 	while (!glfwWindowShouldClose( wndMgr.getWndw() )) {
 
-		mainRenderer.update( 12.5 );
+		mainRenderer.update();
 		mainRenderer.mainDraw( false );
 
 		glfwPollEvents();
@@ -60,3 +64,4 @@ int main( void ) {
 	glfwTerminate();
 	return 0;
 }
+

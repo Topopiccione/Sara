@@ -1,4 +1,5 @@
 #pragma once
+#include <ctime>
 #include <iostream>
 #include <gl\glew.h>
 #include <GLFW\glfw3.h>
@@ -15,11 +16,13 @@ public:
 	void mainDraw( bool postProcess );
 	void fboDraw();
 	void update( float newTime );
+	void update( void );
 
 private:
 	void setupFBO( void );
 	void setupVBO( void );
 
+	std::clock_t start;
 	float					t;
 
 	SaraShaderManager	*	mainShd;

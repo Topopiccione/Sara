@@ -23,7 +23,7 @@ void main2(void)
 	normCoord.x = r * cos(phi);
 	normCoord.y = r * sin(phi);
 	texCoord = normCoord / 2.0 + 0.5;
-	color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
+	color = vec4( texture( tex, texCoord ).xyz, 1.0);
 }
 
 void main(void)
@@ -33,7 +33,7 @@ void main(void)
 	float yy = gl_FragCoord.y;
 	float t = time / 8.0;
 	vec2 texCoord = vec2( uv.s, (1.0 - uv.t) );
-	float lum = length( texture2D( tex, texCoord ).xyz );
+	float lum = length( texture( tex, texCoord ).xyz );
 	vec3 tc = vec3( 1.0, 1.0, 1.0 );
 	
 	if (lum < 1.0) {
@@ -59,5 +59,5 @@ void main(void)
 	if ( xx > ( res_x / 2.0 ) + ( 60.0 * cos( t * 3.3)) * sin ( yy / 64.0 + (2.0 * t )))
 		color = vec4( tc, 1.0 );
 	else
-		color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
+		color = vec4( texture( tex, texCoord ).xyz, 1.0);
 }

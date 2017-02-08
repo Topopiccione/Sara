@@ -107,7 +107,7 @@ void main()
 	// Coordinate (x,y) che variano tra -1.0 e 1.0, come al solito
 	vec2 pixelPos = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
 	pixelPos.x *= resolution.x / resolution.y;
-	//pixelPos.y *= resolution.y / resolution.x; // sistema aspect ratio
+	pixelPos.y *= resolution.y / resolution.x; // sistema aspect ratio
 	float t = time * 0.002;
 	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
 	//vec3 cameraOrigin = vec3( 1.5 + sin(t / 5.0) * 0.5, -1.5 + cos(t / 3.0) * 0.5, 1.5 );

@@ -12,12 +12,13 @@ public:
 	
 	GLFWwindow *	getWndw() const;
 	GLFWwindow *	getWndw();
-	int				getXsize();
-	int				getYsize();
+	//int			getXsize();
+	//int			getYsize();
+	//void			setXsize( int x );
+	//void			setYsize( int y );
 
 private:
 	GLFWwindow	*	window;
 	int				x;
 	int				y;
-
 };

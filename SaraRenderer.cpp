@@ -17,7 +17,7 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 
 	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable( GL_TEXTURE_2D );
-	glViewport( 0, 0, wndMgr->getXsize(), wndMgr->getYsize() );
+	glViewport( 0, 0, global_xRes, global_yRes );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
@@ -26,6 +26,8 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 
 	glEnable( GL_DEPTH_TEST ); // enable depth-testing
 	glDepthFunc( GL_LESS ); // depth-testing interprets a smaller value as "closer"
+
+	start = std::clock();
 	
 }
 
@@ -33,7 +35,13 @@ SaraRenderer::~SaraRenderer() {
 }
 
 void SaraRenderer::update( float newTime ) {
-	t = newTime;
+	//t = newTime;
+	t = static_cast<float>(std::clock() - start) / (double)CLOCKS_PER_SEC;
+}
+
+void SaraRenderer::update() {
+	//t = newTime;
+	t = static_cast<float>(std::clock() - start)  * 200 / (double)CLOCKS_PER_SEC;
 }
 
 void SaraRenderer::mainDraw( bool postProcess ) {
@@ -46,7 +54,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	//glUseProgram( shdprog );
 	glBindProgramPipeline( mainShd->getPipeline() );
 
-	mainShd->setUniforms( wndMgr->getXsize(), wndMgr->getYsize(), t, 0, 0.5 );
+	mainShd->setUniforms( global_xRes, global_yRes, t, 0, 0.5 );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );
@@ -70,7 +78,7 @@ void SaraRenderer::fboDraw( void ) {
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
 
-	mainShd->setUniforms( wndMgr->getXsize(), wndMgr->getYsize(), t, 0, 0.5 );
+	mainShd->setUniforms( global_xRes, global_yRes, t, 0, 0.5 );
 
 	glBindVertexArray( vao );
 	glDrawArrays( GL_QUADS, 0, 4 );
@@ -92,7 +100,7 @@ void SaraRenderer::setupFBO( void ) {
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE ); // automatic mipmap generation included in OpenGL v1.4
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, wndMgr->getXsize(), wndMgr->getYsize(), 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, global_xRes, global_yRes, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
 	// creazione FBO
@@ -111,7 +119,7 @@ void SaraRenderer::setupVBO( void ) {
 	GLfloat vertices[] = {
 		-1.0f, -1.0f,		// coordinate della quad
 		1.0f, -1.0f,
-		0.5f, 1.0f, //1.0f, 1.0f,
+		1.0f, 1.0f,
 		-1.0f, 1.0f,
 		0.0f, 1.0f,		// coordinate della texture già girate
 		1.0f, 1.0f,
@@ -128,19 +136,3 @@ void SaraRenderer::setupVBO( void ) {
 	glBindVertexArray( 0 );
 }
 
-
-
-/*
-while (!glfwWindowShouldClose( wndMgr.getWndw() )) {
-	// wipe the drawing surface clear
-	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-	glUseProgram( shader_programme );
-	glBindVertexArray( vao );
-	// draw points 0-3 from the currently bound VAO with current in-use shader
-	glDrawArrays( GL_TRIANGLES, 0, 3 );
-	// update other events like input handling 
-	glfwPollEvents();
-	// put the stuff we've been drawing onto the display
-	glfwSwapBuffers( wndMgr.getWndw() );
-}
-*/

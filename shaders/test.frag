@@ -1,4 +1,4 @@
-#version 330 core
+/*#version 330 core
 
 in vec2 uv;
 out vec4 color;
@@ -14,10 +14,9 @@ void main( void ) {
 		color = vec4( 0.0, 0.3, 0.7, 1.0);
 }
 
-/*
-#version 400
+*/#version 330
 
 out vec4 frag_colour;
 void main() {
   frag_colour = vec4(0.0, 0.5, 0.5, 1.0);
-}*/
+}
