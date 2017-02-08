@@ -9,7 +9,7 @@ uniform float time;
 
 vec2 resolution = vec2(res_x, res_y);
 vec2 mouse = vec2(0.5, 0.5);
-float timee = time * 0.001;
+float timee = time * 0.005;
 void main( void ) {
 	vec3 pos = vec3(0,0,-8);
 	vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.xy, 1.));

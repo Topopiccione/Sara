@@ -157,8 +157,14 @@ void SaraShaderManager::setUniforms( int resX, int resY, float time, int tex, fl
 	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
 	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
 	// Solo postProcess
-	//glProgramUniform1i( fragmentShaderProgram, tex_loc, tex );		// impostare sempre a 0!
-	//glProgramUniform1f( fragmentShaderProgram, offc_loc, offc );
+	glProgramUniform1i( fragmentShaderProgram, tex_loc, tex );		// impostare sempre a 0!
+	glProgramUniform1f( fragmentShaderProgram, offc_loc, offc );
+}
+
+void SaraShaderManager::setUniforms( int resX, int resY, float time ) {
+	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
+	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
+	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
 }
 
 

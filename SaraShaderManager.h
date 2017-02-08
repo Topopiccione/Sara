@@ -16,6 +16,7 @@ public:
 
 	GLuint getPipeline();
 
+	void	setUniforms( int resX, int resY, float time );
 	void	setUniforms( int resX, int resY, float time, int tex, float offc );
 
 
@@ -40,7 +41,5 @@ private:
 	GLuint					time_loc;
 	GLuint					tex_loc;
 	GLuint					offc_loc;
-
-
 
 };

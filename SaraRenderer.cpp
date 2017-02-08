@@ -1,10 +1,10 @@
 #include "SaraRenderer.h"
 
-
 SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader ) :
 			wndMgr( windowManager ),
 			mainShd( mainShader ),
-			postProcShd( postProcessShader ) {
+			postProcShd( postProcessShader ),
+			twb( "Tua madre" ) {
 
 	// get version info
 	const GLubyte* renderer = glGetString( GL_RENDERER ); // get renderer string
@@ -27,7 +27,14 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 	glEnable( GL_DEPTH_TEST ); // enable depth-testing
 	glDepthFunc( GL_LESS ); // depth-testing interprets a smaller value as "closer"
 
+	// Variabili di rendering da passare agli shader
+	cameraDirection[0] = -0.2f;
+	cameraDirection[1] = 0.5f;
+	cameraDirection[2] = -1.0f;
+	
 	start = std::clock();
+
+
 	
 }
 
@@ -36,12 +43,12 @@ SaraRenderer::~SaraRenderer() {
 
 void SaraRenderer::update( float newTime ) {
 	//t = newTime;
-	t = static_cast<float>(std::clock() - start) / (double)CLOCKS_PER_SEC;
+	t = static_cast<float>(std::clock() - start) / (float)CLOCKS_PER_SEC;
 }
 
 void SaraRenderer::update() {
 	//t = newTime;
-	t = static_cast<float>(std::clock() - start)  * 200 / (double)CLOCKS_PER_SEC;
+	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
 }
 
 void SaraRenderer::mainDraw( bool postProcess ) {
@@ -54,7 +61,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	//glUseProgram( shdprog );
 	glBindProgramPipeline( mainShd->getPipeline() );
 
-	mainShd->setUniforms( global_xRes, global_yRes, t, 0, 0.5 );
+	mainShd->setUniforms( global_xRes, global_yRes, t );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );
@@ -67,6 +74,13 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		fboDraw();
 	}
+
+	if (global_tweakBarsResize) {
+		twb.resize();
+		global_tweakBarsResize = false;
+	}
+	twb.draw();
+
 }
 
 void SaraRenderer::fboDraw( void ) {

@@ -8,6 +8,15 @@ static void win_resize_callback( GLFWwindow * win, int w, int h ) {
 	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
+	global_tweakBarsResize = true;
+}
+
+static void fb_resize_callback( GLFWwindow * win, int w, int h ) {
+	glViewport( 0, 0, global_xRes, global_yRes );
+	glMatrixMode( GL_PROJECTION );
+	glLoadIdentity();
+	glMatrixMode( GL_MODELVIEW );
+	glLoadIdentity();
 }
 
 SaraWindowManager::SaraWindowManager( int xSize, int ySize ) :
@@ -22,6 +31,7 @@ SaraWindowManager::SaraWindowManager( int xSize, int ySize ) :
 		glfwTerminate();
 	}
 	glfwSetWindowSizeCallback( window, win_resize_callback );
+	glfwSetFramebufferSizeCallback( window, fb_resize_callback );	// Ma questo serve a qualcosa?
 }
 
 SaraWindowManager::~SaraWindowManager() {}

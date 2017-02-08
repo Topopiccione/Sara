@@ -7,6 +7,7 @@
 #include "Sara.h"
 #include "SaraWindowManager.h"
 #include "SaraShaderManager.h"
+#include "SaraTweakBar.h"
 
 class SaraRenderer {
 public:
@@ -28,10 +29,14 @@ private:
 	SaraShaderManager	*	mainShd;
 	SaraShaderManager	*	postProcShd;
 	SaraWindowManager	*	wndMgr;
+	SaraTweakBar			twb;
 
 	// FBO e VBO
 	GLuint					frameBufferObj;
 	GLuint					frameBufferObjTex;
 	GLuint					vao, vbo, ibo;
+
+	// Variabili di rendering
+	float				cameraDirection[3];
 
 };
