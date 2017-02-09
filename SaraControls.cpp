@@ -10,6 +10,8 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 			glfwSetWindowShouldClose( window, GLFW_TRUE );
 		if (key == GLFW_KEY_F7 && action == GLFW_PRESS)
 			global_recompileShader = true;
+		if (key == GLFW_KEY_P && action == GLFW_PRESS)
+			global_postProcess = !global_postProcess;
 	}
 }
 

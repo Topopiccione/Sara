@@ -75,7 +75,8 @@ void main()
 	vec2 resolution = vec2( res_x, res_y );
     vec2 pos = (gl_FragCoord.xy*2.0 - resolution.xy) / resolution.y;
     vec3 camPos = vec3(-0.4,1.0,3.0);
-    vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05));
+    //vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05));
+	vec3 camDir = normalize( cameraDirection );
     camPos -=  vec3(0.0,0.0,time*0.005);
     vec3 camUp  = normalize(vec3(0.5, 1.0, 0.0));
     vec3 camSide = cross(camDir, camUp);

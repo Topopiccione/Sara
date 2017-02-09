@@ -6,16 +6,14 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 			postProcShd( postProcessShader ),
 			twb( "Tua madre" ) {
 
-	// get version info
-	const GLubyte* renderer = glGetString( GL_RENDERER ); // get renderer string
-	const GLubyte* version = glGetString( GL_VERSION ); // version as a string
+	const GLubyte* renderer = glGetString( GL_RENDERER ); 
+	const GLubyte* version = glGetString( GL_VERSION );
 	std::cout << "Renderer: " << renderer << std::endl;
 	std::cout << "OpenGL version supported: " << version << std::endl;
 
 	setupFBO();
 	setupVBO();
 
-	// tell GL to only draw onto a pixel if the shape is closer to the viewer
 	glEnable( GL_TEXTURE_2D );
 	glViewport( 0, 0, global_xRes, global_yRes );
 	glMatrixMode( GL_PROJECTION );
@@ -24,17 +22,10 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 	glLoadIdentity();
 	glShadeModel( GL_SMOOTH ); // questo andrebbe rivisto
 
-	glEnable( GL_DEPTH_TEST ); // enable depth-testing
-	glDepthFunc( GL_LESS ); // depth-testing interprets a smaller value as "closer"
-
-	// Variabili di rendering da passare agli shader
-	cameraDirection[0] = -0.2f;
-	cameraDirection[1] = 0.5f;
-	cameraDirection[2] = -1.0f;
+	glEnable( GL_DEPTH_TEST );
+	glDepthFunc( GL_LESS );
 	
 	start = std::clock();
-
-
 	
 }
 
@@ -42,12 +33,10 @@ SaraRenderer::~SaraRenderer() {
 }
 
 void SaraRenderer::update( float newTime ) {
-	//t = newTime;
-	t = static_cast<float>(std::clock() - start) / (float)CLOCKS_PER_SEC;
+	t = newTime;
 }
 
 void SaraRenderer::update() {
-	//t = newTime;
 	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
 }
 
@@ -58,7 +47,6 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	glClearColor( 1.0, 0.0, 0.0, 1.0 );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-	//glUseProgram( shdprog );
 	glBindProgramPipeline( mainShd->getPipeline() );
 
 	mainShd->setUniforms( global_xRes, global_yRes, t );
@@ -67,7 +55,6 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 		glDrawArrays( GL_QUADS, 0, 4 );
 	glBindVertexArray( 0 );
 
-	//glUseProgram( 0 );
 	glBindProgramPipeline( 0 );
 
 	if (postProcess) {
@@ -92,7 +79,7 @@ void SaraRenderer::fboDraw( void ) {
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
 
-	mainShd->setUniforms( global_xRes, global_yRes, t, 0, 0.5 );
+	mainShd->setUniforms( global_xRes, global_yRes, t, 0, -1.5 );
 
 	glBindVertexArray( vao );
 	glDrawArrays( GL_QUADS, 0, 4 );

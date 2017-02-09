@@ -5,8 +5,9 @@ out vec4 color;
 uniform float time;
 uniform int res_x;
 uniform int res_y;
+uniform vec3 cameraDirection;
 
-float  iGlobalTime = time* 0.001;
+float  iGlobalTime = time* 0.005;
 
 const int MaxSteps = 77;
 const float MinimumDistance = 0.0009;
@@ -123,7 +124,8 @@ vec4 rayMarch( vec3 from, vec3 dir ) {
 void main( void ) {
 	// Camera position (eye), and camera target
 	vec3 camPos = 0.5 * iGlobalTime * vec3( 0.0, 0.0, 0.3333 );
-	vec3 target = camPos + vec3( 1.0, 0.0, 0.0 );
+	//vec3 target = camPos + vec3( 1.0, 0.0, 0.0 );
+	vec3 target = camPos + cameraDirection;
 	vec3 camUp  = vec3( 0.0, 1.0, 0.0);
 	
 	// Calculate orthonormal camera reference system

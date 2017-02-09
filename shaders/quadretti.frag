@@ -6,6 +6,8 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
+uniform vec3 cameraDirection;
+
 
 vec2 resolution = vec2(res_x, res_y);
 vec2 mouse = vec2(0.5, 0.5);

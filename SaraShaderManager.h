@@ -12,7 +12,7 @@ public:
 	~SaraShaderManager();
 
 	void setupShaders();
-	void recompileShaders();
+	void compileShaders();
 
 	GLuint getPipeline();
 
@@ -39,6 +39,7 @@ private:
 	GLuint					res_x_loc;
 	GLuint					res_y_loc;
 	GLuint					time_loc;
+	GLuint					camera_loc;
 	GLuint					tex_loc;
 	GLuint					offc_loc;
 
