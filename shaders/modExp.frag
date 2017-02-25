@@ -6,7 +6,7 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
-uniform vec3 cameraDirection;
+uniform vec2 angle;
 
 const int MAX_ITER = 100;
 const float MAX_DIST = 25.0;
@@ -101,6 +101,21 @@ float shadow( vec3 p, vec3 l, float r, float d, float i ) {
 	return max( o / r, 0.0 );
 }
 
+// Restituisce la matrice di rotazione a partire da una coppia di angoli corrispondenti ad
+// un movimento del mouse sul piano XY.
+// La matrice in output è data dalla moltiplicazione delle matrici yaw e pitch:
+// http://planning.cs.uiuc.edu/node102.html
+mat3 rotationXY( vec2 angl ) {
+	vec2 c = cos( angl.yx );
+	vec2 s = sin( angl.yx );
+	
+	// conti fatti a mano (le matrici non tornavano...)
+	return mat3(
+		c.x*c.y, -s.x*c.y, s.y,
+		s.x, c.x, 0.0,
+		-c.x*s.y, s.x*s.y, c.y);
+}
+
 
 void main()
 {
@@ -108,18 +123,16 @@ void main()
 	// Coordinate (x,y) che variano tra -1.0 e 1.0, come al solito
 	vec2 pixelPos = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
 	pixelPos.x *= resolution.x / resolution.y;
-	//pixelPos.y *= resolution.y / resolution.x; // sistema aspect ratio
 	float t = time * 0.002;
+	
+	mat3 rot = rotationXY( angle );
+	
 	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
-	//vec3 cameraOrigin = vec3( 1.5 + sin(t / 5.0) * 0.5, -1.5 + cos(t / 3.0) * 0.5, 1.5 );
-	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 );
-	//vec3 cameraOrigin = vec3( 5.0, 0.0, 0.0 );
-	//vec3 cameraOrigin = vec3( 0.0, 0.5, 0.5);
-	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
+	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 ) * rot;
+	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 ) * rot;
 	
 	// Direzione in cui punta la camera ( versore ) = normalized cameraOrigin - cameraTarget
-	//vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
-	vec3 cameraDir    = normalize( cameraDirection - cameraOrigin );
+	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
 	
 	// Direzione destra dalla prospettiva della camera, calcolata con prodotto vettoriale normalizzato
 	// regola della mano destra

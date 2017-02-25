@@ -39,9 +39,9 @@ private:
 	GLuint					res_x_loc;
 	GLuint					res_y_loc;
 	GLuint					time_loc;
-	GLuint					camera_loc;
 	GLuint					tex_loc;
 	GLuint					offc_loc;
+	GLuint					angle_loc;
 
 	// coordinate rotazione
 	float					rotaz[3];

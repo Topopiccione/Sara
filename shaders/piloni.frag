@@ -3,7 +3,7 @@
 uniform int res_x;
 uniform int res_y;
 uniform float time;
-uniform vec3 cameraDirection;
+uniform vec2 angle;
 
 
 float sdBox( vec3 p, vec3 b )
@@ -70,15 +70,32 @@ vec3 genNormal(vec3 p)
         map(p+vec3(0.0,0.0,  d))-map(p+vec3(0.0,0.0, -d)) ));
 }
 
+mat3 rotationXY( vec2 angl ) {
+	vec2 c = cos( angl.yx );
+	vec2 s = sin( angl.yx );
+	// conti fatti a mano (le matrici non tornavano...)
+	return mat3(
+		c.x*c.y, -s.x*c.y, s.y,
+		s.x, c.x, 0.0,
+		-c.x*s.y, s.x*s.y, c.y);
+	/*return mat3(
+		c.x*c.y, -s.x, s.y*c.x,
+		s.x*c.y, c.x, s.x*s.y,
+		-s.y, 0, c.x);*/
+	/*return mat3(
+		c.y, 0, -s.y,
+		s.x*s.y, c.x, c.y*s.x,
+		s.y*c.x, -s.x, c.y*c.x);*/
+}
+
 void main()
 {
 	vec2 resolution = vec2( res_x, res_y );
     vec2 pos = (gl_FragCoord.xy*2.0 - resolution.xy) / resolution.y;
-    vec3 camPos = vec3(-0.4,1.0,3.0);
-    //vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05));
-	vec3 camDir = normalize( cameraDirection );
+    vec3 camPos = vec3(-0.4,1.0,3.0) * rotationXY( angle );
+    vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05) * rotationXY( angle ));
     camPos -=  vec3(0.0,0.0,time*0.005);
-    vec3 camUp  = normalize(vec3(0.5, 1.0, 0.0));
+    vec3 camUp  = normalize(vec3(0.0, 1.0, 0.0));
     vec3 camSide = cross(camDir, camUp);
     float focus = 1.8;
 

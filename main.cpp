@@ -23,7 +23,7 @@ bool global_tweakBarsResize = false;
 bool global_postProcess = false;
 bool global_cameraMoving = false;
 bool global_cameraStartMoving = true;
-float global_cameraDirection[3] = { -0.2f, 0.5f, -1.0f };
+float global_angle[2] = { 0.0f, 0.0f };
 double global_startX = 0.0;
 double global_startY = 0.0;
 
@@ -46,13 +46,13 @@ int main( void ) {
 	if (GLEW_OK != err)
 		std::cout << "Errore glew init: " << glewGetErrorString( err ) << std::endl;
 
-	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\modExp.frag" ) );
+	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\modExp.frag" ) );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\massiveClod.frag" ) );
 	
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\quadretti.frag" ) );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\superstructure.frag" ) );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\test3.frag" ) );
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\piloni.frag" ) );
+	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\piloni.frag" ) );
 	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
 	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader );
