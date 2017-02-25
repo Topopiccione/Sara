@@ -21,7 +21,11 @@ int global_yRes = 480;
 bool global_recompileShader = false;
 bool global_tweakBarsResize = false;
 bool global_postProcess = false;
+bool global_cameraMoving = false;
+bool global_cameraStartMoving = true;
 float global_cameraDirection[3] = { -0.2f, 0.5f, -1.0f };
+double global_startX = 0.0;
+double global_startY = 0.0;
 
 
 int main( void ) {
@@ -43,6 +47,8 @@ int main( void ) {
 		std::cout << "Errore glew init: " << glewGetErrorString( err ) << std::endl;
 
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\modExp.frag" ) );
+	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\massiveClod.frag" ) );
+	
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\quadretti.frag" ) );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\superstructure.frag" ) );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\test3.frag" ) );
@@ -55,6 +61,7 @@ int main( void ) {
 	glfwSetCursorPosCallback( wndMgr.getWndw(), cursor_position_callback );
 	glfwSetMouseButtonCallback( wndMgr.getWndw(), mouse_button_callback );
 	glfwSetScrollCallback( wndMgr.getWndw(), scroll_callback );
+	glfwSetInputMode( wndMgr.getWndw(), GLFW_STICKY_MOUSE_BUTTONS, 0 );
 	
 	// LOOP
 	while (!glfwWindowShouldClose( wndMgr.getWndw() )) {

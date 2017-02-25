@@ -1,17 +1,19 @@
-#version 330 core
+#ifdef GL_ES
+precision mediump float;
+#endif
 
-in vec2 uv;
-out vec4 color;
+#extension GL_OES_standard_derivatives : enable
 
-uniform int res_x;
-uniform int res_y;
 uniform float time;
-uniform vec3 cameraDirection;
+uniform vec2 mouse;
+uniform vec2 resolution;
+
+uniform sampler2D backbuffer;
 
 const int MAX_ITER = 100;
 const float MAX_DIST = 25.0;
 const float EPSILON  = 0.001;
-vec2 resolution = vec2( res_x, res_y );
+//vec2 resolution = vec2( res_x, res_y );
 
 
 float nlength( vec3 v, float n ){
@@ -95,8 +97,9 @@ float distFunct( vec3 pos ) {
 // r: "some kind of shadow hardness"; d: stepwidth; i: number of steps
 float shadow( vec3 p, vec3 l, float r, float d, float i ) {
 	float o;
-	for( ; i > 0.0; i-- ) {
-		o = min( distFunct( p + l*i*d ), r );
+
+	for ( float ii = 4.0; ii > 0.0; ii-=.5){
+		o = min( distFunct( p + l*ii*d ), r );
 	}
 	return max( o / r, 0.0 );
 }
@@ -109,17 +112,15 @@ void main()
 	vec2 pixelPos = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
 	pixelPos.x *= resolution.x / resolution.y;
 	//pixelPos.y *= resolution.y / resolution.x; // sistema aspect ratio
-	float t = time * 0.002;
+	float t = time * 0.2;
 	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
 	//vec3 cameraOrigin = vec3( 1.5 + sin(t / 5.0) * 0.5, -1.5 + cos(t / 3.0) * 0.5, 1.5 );
-	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 );
-	//vec3 cameraOrigin = vec3( 5.0, 0.0, 0.0 );
+	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75 , - cos(t / 3.0) * 0.5, 0.5 );
 	//vec3 cameraOrigin = vec3( 0.0, 0.5, 0.5);
-	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
+	vec3 cameraTarget = vec3( 0.0, 0.0, 0.0 );
 	
 	// Direzione in cui punta la camera ( versore ) = normalized cameraOrigin - cameraTarget
-	//vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
-	vec3 cameraDir    = normalize( cameraDirection - cameraOrigin );
+	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
 	
 	// Direzione destra dalla prospettiva della camera, calcolata con prodotto vettoriale normalizzato
 	// regola della mano destra
@@ -130,7 +131,7 @@ void main()
 	
 	// calcola la direzione del raggio a partire dalle coordinate del punto dello schermo
 	// e dalla posizione della camera
-	vec3 rayDir       = normalize( cameraRight * pixelPos.x + cameraUp * pixelPos.y + 1.5*cameraDir);
+	vec3 rayDir       = normalize( cameraRight * pixelPos.x + cameraUp * pixelPos.y + 1.5*cameraDir );
 	
 	
 	float totalDist = 0.0;
@@ -160,29 +161,30 @@ void main()
 	float diffuse = max(0.0, dot(-rayDir, normal));
 	
 	// Specular lighting: diffuse elevato ad una potenza "grande"
-	float specular = pow( diffuse, 32.0 );
+	float specular = pow( diffuse, 16.0 );
 	
 	// colore finale =  somma delle componenti di diffusione e riflessione
 	float colour = diffuse + specular;
 
 	float shdw = shadow(pos, normalize(vec3(0.5,1.0,0.0)), 0.1, 0.1, 15.0);
-	colour += shdw * 1.75;
+	//float shdw = 1.0;
+	colour += shdw * 4.5;
 
 	float lenPos = length(pos);
 
-	/*
+	
 	// test antialiasing che tanto non funziona
-	float w = 3.0*fwidth(dist);
+	/*float w = 3.0*fwidth(dist);
 	eps = vec2(0.0, EPSILON * 10.0);
 	float cx = colour + mix(distFunct(pos - eps.yxx), distFunct(pos + eps.yxx), smoothstep(-w,w,dist));
 	float cy = colour + mix(distFunct(pos - eps.xyx), distFunct(pos + eps.xyx), smoothstep(-w,w,dist));
 	float cz = colour + mix(distFunct(pos - eps.xxy), distFunct(pos + eps.xxy), smoothstep(-w,w,dist));
-	color = vec4( vec3( cx/(lenPos*lenPos), cy*0.5 / (lenPos*lenPos), cz*0.9/lenPos ), 1.0 );
-	return;
-	*/
+	gl_FragColor = vec4( vec3( cx/(lenPos*lenPos), cy*0.5 / (lenPos*lenPos), cz*0.9/lenPos ), 1.0 );
+	return;*/
+	
 
 	// finta occlusion map: dividere per potenze di lenPos
-	color = vec4( vec3( colour/(lenPos*lenPos), colour*0.5 / (lenPos*lenPos), colour*0.9/lenPos ), 1.0 );
+	gl_FragColor = vec4( vec3( colour/(lenPos*lenPos)*0.5, colour*0.5 / (lenPos*lenPos), colour*0.9/lenPos ), 1.0 );
 	//color = vec4( shdw, shdw * 0.5, shdw * 0.9, 1.0 );
 	
 }

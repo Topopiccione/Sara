@@ -43,4 +43,7 @@ private:
 	GLuint					tex_loc;
 	GLuint					offc_loc;
 
+	// coordinate rotazione
+	float					rotaz[3];
+
 };

@@ -13,6 +13,8 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 		" label='Camera direction' opened=true help='Cambia punto di vista' " );
 	//TwAddButton( bar, "Post Process", NULL, &global_postProcess, "label='Post Process'" );
 
+	TwAddVarRO( bar, "g_startX", TW_TYPE_DOUBLE, &global_startX, " label='global startX' " );
+	TwAddVarRO( bar, "g_startY", TW_TYPE_DOUBLE, &global_startY, " label='global startX' " );
 }
 
 

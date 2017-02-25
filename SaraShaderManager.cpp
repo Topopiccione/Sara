@@ -69,19 +69,28 @@ void SaraShaderManager::setUniforms( int resX, int resY, float time, int tex, fl
 	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
 	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
 	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
-	//glProgramUniform3f( fragmentShaderProgram, camera_loc, global_cameraDirection[0], global_cameraDirection[1], global_cameraDirection[2] );
-	//glProgramUniform3f( fragmentShaderProgram, camera_loc, -0.2f, 0.5f, 0.05f );
 	// Solo postProcess
 	glProgramUniform1i( fragmentShaderProgram, tex_loc, tex );		// impostare sempre a 0!
 	glProgramUniform1f( fragmentShaderProgram, offc_loc, offc );
 }
 
 void SaraShaderManager::setUniforms( int resX, int resY, float time ) {
-	GLfloat	cacchio[3] = { global_cameraDirection[0], global_cameraDirection[1], global_cameraDirection[3] };
 	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
 	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
 	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
-	glProgramUniform3f( fragmentShaderProgram, camera_loc, global_cameraDirection[0], global_cameraDirection[1], global_cameraDirection[3] );
+	// converto cordinate sferiche a cartesiane
+	/*rotaz[0] = global_cameraDirection[2] * cos( global_cameraDirection[0] ) * cos( global_cameraDirection[1] );
+	rotaz[1] = global_cameraDirection[2] * cos( global_cameraDirection[0] ) * sin( global_cameraDirection[1] );
+	rotaz[2] = global_cameraDirection[2] * sin( global_cameraDirection[0] );*/
+	/*rotaz[0] = global_cameraDirection[2] * sin( global_cameraDirection[0] ) * cos( global_cameraDirection[1] );
+	rotaz[1] = global_cameraDirection[2] * sin( global_cameraDirection[0] ) * sin( global_cameraDirection[1] );
+	rotaz[2] = global_cameraDirection[2] * cos( global_cameraDirection[0] );*/
+	/*rotaz[0] = cos( global_cameraDirection[2] ) * sin( global_cameraDirection[1] );
+	rotaz[1] = sin( global_cameraDirection[2] );
+	rotaz[2] = cos( global_cameraDirection[2] ) * cos( global_cameraDirection[1] );
+	glProgramUniform3fv( fragmentShaderProgram, camera_loc, 1, rotaz );*/
+	glProgramUniform3fv( fragmentShaderProgram, camera_loc, 1, global_cameraDirection );
+	//glProgramUniform3f( fragmentShaderProgram, camera_loc, global_cameraDirection[0], global_cameraDirection[1], global_cameraDirection[3] );
 }
 
 
