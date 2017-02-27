@@ -15,6 +15,7 @@
 #include "SaraControls.h"
 
 #define SHDPATH "C:\\Users\\User\\Documents\\git\\Sara\\"
+//#define SHDPATH ""
 
 int		global_xRes = 640;
 int		global_yRes = 480;
