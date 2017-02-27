@@ -10,7 +10,7 @@ SaraShaderManager::SaraShaderManager( std::string vertShaderFilename, std::strin
 SaraShaderManager::SaraShaderManager( std::string vertShaderFilename, std::vector<std::string> fragmShaderFilenameVector ) :
 			vertexShaderFilename( vertShaderFilename ),
 			fragmentShaderFilenameVector( fragmShaderFilenameVector ),
-			currentFragShd( global_shaderNumber ) {
+			currentFragShd( SaraGlobal::shaderNumber ) {
 
 	fragmentShaderFilename = fragmentShaderFilenameVector[currentFragShd];
 	compileShaders();
@@ -23,8 +23,8 @@ GLuint SaraShaderManager::getPipeline() {
 }
 
 void SaraShaderManager::checkGlobalShd() {
-	if (global_shaderNumber != currentFragShd) {
-		currentFragShd = global_shaderNumber;
+	if (SaraGlobal::shaderNumber != currentFragShd) {
+		currentFragShd = SaraGlobal::shaderNumber;
 		fragmentShaderFilename = fragmentShaderFilenameVector[currentFragShd];
 		compileShaders();
 	}
@@ -95,12 +95,11 @@ void SaraShaderManager::setUniforms( int resX, int resY, float time ) {
 	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
 	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
 	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
-	glProgramUniform2fv( fragmentShaderProgram, angle_loc, 1, global_angle );
+	glProgramUniform2fv( fragmentShaderProgram, angle_loc, 1, SaraGlobal::angle );
 }
 
 
-GLchar* SaraShaderManager::filetobuf( const char *file )
-{
+GLchar* SaraShaderManager::filetobuf( const char *file ) {
 	FILE *fptr;
 	long length;
 	GLchar *buf;

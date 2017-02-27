@@ -1,16 +1,20 @@
 #pragma once
 #include <iostream>
 
-extern int		global_xRes;
-extern int		global_yRes;
-extern float	global_angle[2];
-extern double	global_startX;
-extern double	global_startY;
-extern int		global_shaderNumber;
+namespace SaraGlobal {
 
-// events
-extern bool		global_recompileShader;
-extern bool		global_tweakBarsResize;
-extern bool		global_postProcess;
-extern bool		global_cameraMoving;
-extern bool		global_cameraStartMoving;
+	extern int		xRes;
+	extern int		yRes;
+	extern float	angle[2];
+	extern double	startX;
+	extern double	startY;
+	extern int		shaderNumber;
+	extern float	postProcVar;
+	// events
+	extern bool		recompileShader;
+	extern bool		windowResize;
+	extern bool		postProcess;
+	extern bool		cameraMoving;
+	extern bool		cameraStartMoving;
+
+};

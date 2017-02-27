@@ -15,7 +15,7 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 	setupVBO();
 
 	glEnable( GL_TEXTURE_2D );
-	glViewport( 0, 0, global_xRes, global_yRes );
+	glViewport( 0, 0, SaraGlobal::xRes, SaraGlobal::yRes );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
@@ -50,7 +50,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 
 	glBindProgramPipeline( mainShd->getPipeline() );
 
-	mainShd->setUniforms( global_xRes, global_yRes, t );
+	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );
@@ -63,9 +63,10 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 		fboDraw();
 	}
 
-	if (global_tweakBarsResize) {
+	if (SaraGlobal::windowResize) {
 		twb.resize();
-		global_tweakBarsResize = false;
+		setupFBO();
+		SaraGlobal::windowResize = false;
 	}
 	twb.draw();
 
@@ -80,7 +81,7 @@ void SaraRenderer::fboDraw( void ) {
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
 
-	mainShd->setUniforms( global_xRes, global_yRes, t, 0, -1.5 );
+	postProcShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, 0, SaraGlobal::postProcVar );
 
 	glBindVertexArray( vao );
 	glDrawArrays( GL_QUADS, 0, 4 );
@@ -102,7 +103,7 @@ void SaraRenderer::setupFBO( void ) {
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE ); // automatic mipmap generation included in OpenGL v1.4
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, global_xRes, global_yRes, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, SaraGlobal::xRes, SaraGlobal::yRes, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
 	// creazione FBO

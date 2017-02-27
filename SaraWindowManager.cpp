@@ -1,18 +1,18 @@
 #include "SaraWindowManager.h"
 
 static void win_resize_callback( GLFWwindow * win, int w, int h ) {
-	global_xRes = w;
-	global_yRes = h;
-	glViewport( 0, 0, global_xRes, global_yRes );
+	SaraGlobal::xRes = w;
+	SaraGlobal::yRes = h;
+	glViewport( 0, 0, SaraGlobal::xRes, SaraGlobal::yRes );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
 	glLoadIdentity();
-	global_tweakBarsResize = true;
+	SaraGlobal::windowResize = true;
 }
 
 static void fb_resize_callback( GLFWwindow * win, int w, int h ) {
-	glViewport( 0, 0, global_xRes, global_yRes );
+	glViewport( 0, 0, SaraGlobal::xRes, SaraGlobal::yRes );
 	glMatrixMode( GL_PROJECTION );
 	glLoadIdentity();
 	glMatrixMode( GL_MODELVIEW );
@@ -43,20 +43,3 @@ GLFWwindow * SaraWindowManager::getWndw() {
 GLFWwindow * SaraWindowManager::getWndw() const {
 	return window;
 }
-/*
-int SaraWindowManager::getXsize() {
-	return x;
-}
-
-int SaraWindowManager::getYsize() {
-	return y;
-}
-
-void SaraWindowManager::setXsize( int xSize ) {
-	x = xSize;
-}
-
-void SaraWindowManager::setYsize( int ySize ) {
-	y = ySize;
-}
-*/

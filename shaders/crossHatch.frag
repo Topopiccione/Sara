@@ -4,21 +4,19 @@ in vec2 uv;
 out vec4 color;
 
 uniform sampler2D tex;
-uniform float res_x;
-uniform float res_y;
+uniform int res_x;
+uniform int res_y;
 uniform float Offc;
 uniform float time;
 
-float Delta = 2.0;
-
-void main2(void)
+void main(void)
 {
 	vec2 texCoord = gl_FragCoord.xy / vec2( res_x, res_y );
 	vec2 normCoord = 2.0 * texCoord - 1.0;
 	float r = length( normCoord );
 	float phi = atan( normCoord.y, normCoord.x );
 	
-	r = pow(r, 1.0/Delta) / Delta;
+	r = pow(r, 1.0/Offc) / Offc;
 	
 	normCoord.x = r * cos(phi);
 	normCoord.y = r * sin(phi);
@@ -26,12 +24,12 @@ void main2(void)
 	color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
 }
 
-void main(void)
+void main2(void)
 {
 
 	float xx = gl_FragCoord.x;
 	float yy = gl_FragCoord.y;
-	float t = time / 8.0;
+	float t = time / 80.0;
 	vec2 texCoord = vec2( uv.s, (1.0 - uv.t) );
 	float lum = length( texture2D( tex, texCoord ).xyz );
 	vec3 tc = vec3( 1.0, 1.0, 1.0 );

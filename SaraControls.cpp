@@ -9,23 +9,29 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 		if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			glfwSetWindowShouldClose( window, GLFW_TRUE );
 		if (key == GLFW_KEY_F7 && action == GLFW_PRESS)
-			global_recompileShader = true;
+			SaraGlobal::recompileShader = true;
 		if (key == GLFW_KEY_P && action == GLFW_PRESS)
-			global_postProcess = !global_postProcess;
+			SaraGlobal::postProcess = !SaraGlobal::postProcess;
 	}
 }
+
+/*void character_callback( GLFWwindow* window, unsigned int codepoint ) {
+	if (!TwEventCharGLFW(codepoint, NULL)) {
+
+	}
+}*/
 
 
 void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
 	double incrementX, incrementY;
 	if (!TwEventMousePosGLFW( xpos, ypos )) {
-		if (global_cameraMoving == true) {
-			incrementX = (xpos - global_startX) / 500.0 ;
-			incrementY = (ypos - global_startY) / 500.0;
-			global_angle[0] += incrementX;
-			global_angle[1] += incrementY;
-			global_startX = xpos;
-			global_startY = ypos;
+		if (SaraGlobal::cameraMoving == true) {
+			incrementX = (xpos - SaraGlobal::startX) / 500.0;
+			incrementY = (ypos - SaraGlobal::startY) / 500.0;
+			SaraGlobal::angle[0] += incrementX;
+			SaraGlobal::angle[1] += incrementY;
+			SaraGlobal::startX = xpos;
+			SaraGlobal::startY = ypos;
 		}
 	}
 }
@@ -33,15 +39,15 @@ void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
 void mouse_button_callback( GLFWwindow* window, int button, int action, int mods ) {
 	if (!TwEventMouseButtonGLFW( button, action )) {
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-			global_cameraMoving = true;
-			if (global_cameraStartMoving) {
-				glfwGetCursorPos( window, &global_startX, &global_startY );
-				global_cameraStartMoving = false;
+			SaraGlobal::cameraMoving = true;
+			if (SaraGlobal::cameraStartMoving) {
+				glfwGetCursorPos( window, &SaraGlobal::startX, &SaraGlobal::startY );
+				SaraGlobal::cameraStartMoving = false;
 			}
 		}
 		else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-			global_cameraMoving = false;
-			global_cameraStartMoving = true;
+			SaraGlobal::cameraMoving = false;
+			SaraGlobal::cameraStartMoving = true;
 		}
 	}
 }

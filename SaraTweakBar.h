@@ -15,4 +15,5 @@ public:
 private:
 	TwBar		*	bar;
 	std::string		barName;
+
 };
