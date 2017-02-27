@@ -71,21 +71,13 @@ vec3 genNormal(vec3 p)
 }
 
 mat3 rotationXY( vec2 angl ) {
-	vec2 c = cos( angl.yx );
-	vec2 s = sin( angl.yx );
+	vec2 c = cos( vec2(-angl.y, angl.x) );
+	vec2 s = sin( vec2(-angl.y, angl.x) );
 	// conti fatti a mano (le matrici non tornavano...)
 	return mat3(
 		c.x*c.y, -s.x*c.y, s.y,
 		s.x, c.x, 0.0,
 		-c.x*s.y, s.x*s.y, c.y);
-	/*return mat3(
-		c.x*c.y, -s.x, s.y*c.x,
-		s.x*c.y, c.x, s.x*s.y,
-		-s.y, 0, c.x);*/
-	/*return mat3(
-		c.y, 0, -s.y,
-		s.x*s.y, c.x, c.y*s.x,
-		s.y*c.x, -s.x, c.y*c.x);*/
 }
 
 void main()

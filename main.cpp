@@ -16,16 +16,17 @@
 
 #define SHDPATH "C:\\Users\\User\\Documents\\git\\Sara\\"
 
-int global_xRes = 640;
-int global_yRes = 480;
-bool global_recompileShader = false;
-bool global_tweakBarsResize = false;
-bool global_postProcess = false;
-bool global_cameraMoving = false;
-bool global_cameraStartMoving = true;
-float global_angle[2] = { 0.0f, 0.0f };
-double global_startX = 0.0;
-double global_startY = 0.0;
+int		global_xRes = 640;
+int		global_yRes = 480;
+bool	global_recompileShader = false;
+bool	global_tweakBarsResize = false;
+bool	global_postProcess = false;
+bool	global_cameraMoving = false;
+bool	global_cameraStartMoving = true;
+float	global_angle[2] = { 0.0f, 0.0f };
+double	global_startX = 0.0;
+double	global_startY = 0.0;
+int		global_shaderNumber = 0;
 
 
 int main( void ) {
@@ -46,13 +47,16 @@ int main( void ) {
 	if (GLEW_OK != err)
 		std::cout << "Errore glew init: " << glewGetErrorString( err ) << std::endl;
 
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\modExp.frag" ) );
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\massiveClod.frag" ) );
-	
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\quadretti.frag" ) );
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\superstructure.frag" ) );
-	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\test3.frag" ) );
-	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\piloni.frag" ) );
+	std::vector<std::string> shaderNames = {
+		SHDPATH + std::string( "shaders\\modExp.frag" ),
+		SHDPATH + std::string( "shaders\\massiveClod.frag" ),
+		SHDPATH + std::string( "shaders\\quadretti.frag" ),
+		SHDPATH + std::string( "shaders\\test3.frag" ),
+		SHDPATH + std::string( "shaders\\piloni.frag" ) };
+		//SHDPATH + std::string( "shaders\\superstructure.frag" )
+
+	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );
+
 	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
 	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader );

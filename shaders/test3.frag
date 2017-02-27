@@ -6,6 +6,7 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
+uniform vec2 angle;
 
 
 // uniform float time;
@@ -78,6 +79,19 @@ vec3 raymarch( in vec3 ro, vec3 rd, vec2 tminmax )
 }
 
 
+mat3 rotationXY( vec2 angl ) {
+	vec2 c = cos( -angl.yx );
+	vec2 s = sin( angl.yx );
+	return mat3(
+		c.y, 0, -s.y,
+		s.y*s.x, c.x, c.y*s.x,
+		s.y*c.x, -s.x, c.y*c.x);
+	return mat3(
+		c.x*c.y, -s.x*c.y, s.y,
+		s.x, c.x, 0.0,
+		-c.x*s.y, s.x*s.y, c.y);
+}
+
 void main()
 {
 	vec2 resolution = vec2( res_x, res_y );
@@ -90,10 +104,10 @@ void main()
 
     // camera
 
-    vec3 ro = zoom*vec3(4.);
+    vec3 ro = zoom*vec3(4.) * rotationXY( angle );
     ro.yz*=rot(m.y);
     ro.xz*=rot(m.x+ 0.0001*time);
-    vec3 ta = vec3( 0.0 , 0.0, 0.0 );
+    vec3 ta = vec3( 0.0, 0.0, 0.0 ) * rotationXY( angle );
     vec3 ww = normalize( ta - ro );
     vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
     vec3 vv = normalize( cross(uu,ww));

@@ -11,6 +11,7 @@ uniform vec2 angle;
 const int MAX_ITER = 100;
 const float MAX_DIST = 25.0;
 const float EPSILON  = 0.001;
+const float fieldOfView = 1.0;
 vec2 resolution = vec2( res_x, res_y );
 
 
@@ -143,7 +144,7 @@ void main()
 	
 	// calcola la direzione del raggio a partire dalle coordinate del punto dello schermo
 	// e dalla posizione della camera
-	vec3 rayDir       = normalize( cameraRight * pixelPos.x + cameraUp * pixelPos.y + 1.5*cameraDir);
+	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + 1.5*cameraDir);
 	
 	
 	float totalDist = 0.0;

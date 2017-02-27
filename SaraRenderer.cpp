@@ -4,7 +4,7 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 			wndMgr( windowManager ),
 			mainShd( mainShader ),
 			postProcShd( postProcessShader ),
-			twb( "Tua madre" ) {
+			twb( "SaraParams" ) {
 
 	const GLubyte* renderer = glGetString( GL_RENDERER ); 
 	const GLubyte* version = glGetString( GL_VERSION );
@@ -38,6 +38,7 @@ void SaraRenderer::update( float newTime ) {
 
 void SaraRenderer::update() {
 	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
+	mainShd->checkGlobalShd();
 }
 
 void SaraRenderer::mainDraw( bool postProcess ) {

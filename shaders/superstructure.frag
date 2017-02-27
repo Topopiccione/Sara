@@ -5,7 +5,7 @@ out vec4 color;
 uniform float time;
 uniform int res_x;
 uniform int res_y;
-uniform vec3 cameraDirection;
+uniform vec2 angle;
 
 float  iGlobalTime = time* 0.005;
 
@@ -121,11 +121,21 @@ vec4 rayMarch( vec3 from, vec3 dir ) {
 	return vec4( color, 1.0 );
 }
 
+mat3 rotationXY( vec2 angl ) {
+	vec2 c = cos( angl );
+	vec2 s = sin( angl );
+	
+	// conti fatti a mano (le matrici non tornavano...)
+	return mat3(
+		c.x*c.y, -s.x*c.y, s.y,
+		s.x, c.x, 0.0,
+		-c.x*s.y, s.x*s.y, c.y);
+}
+
 void main( void ) {
 	// Camera position (eye), and camera target
-	vec3 camPos = 0.5 * iGlobalTime * vec3( 0.0, 0.0, 0.3333 );
-	//vec3 target = camPos + vec3( 1.0, 0.0, 0.0 );
-	vec3 target = camPos + cameraDirection;
+	vec3 camPos = 0.5 * iGlobalTime * vec3( 0.0, 0.0, 0.3333 ) * rotationXY( angle / 10.0 );
+	vec3 target = (camPos + vec3( 1.0, 0.0, 0.0 )) * rotationXY( angle / 10.0 );
 	vec3 camUp  = vec3( 0.0, 1.0, 0.0);
 	
 	// Calculate orthonormal camera reference system

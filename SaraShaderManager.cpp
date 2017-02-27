@@ -7,10 +7,27 @@ SaraShaderManager::SaraShaderManager( std::string vertShaderFilename, std::strin
 	compileShaders();
 }
 
+SaraShaderManager::SaraShaderManager( std::string vertShaderFilename, std::vector<std::string> fragmShaderFilenameVector ) :
+			vertexShaderFilename( vertShaderFilename ),
+			fragmentShaderFilenameVector( fragmShaderFilenameVector ),
+			currentFragShd( global_shaderNumber ) {
+
+	fragmentShaderFilename = fragmentShaderFilenameVector[currentFragShd];
+	compileShaders();
+}
+
 SaraShaderManager::~SaraShaderManager() {}
 
 GLuint SaraShaderManager::getPipeline() {
 	return mainPipeline;
+}
+
+void SaraShaderManager::checkGlobalShd() {
+	if (global_shaderNumber != currentFragShd) {
+		currentFragShd = global_shaderNumber;
+		fragmentShaderFilename = fragmentShaderFilenameVector[currentFragShd];
+		compileShaders();
+	}
 }
 
 

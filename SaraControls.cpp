@@ -12,14 +12,6 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 			global_recompileShader = true;
 		if (key == GLFW_KEY_P && action == GLFW_PRESS)
 			global_postProcess = !global_postProcess;
-		if (key == GLFW_KEY_D && action == GLFW_PRESS)
-			global_angle[0] += 0.1;
-		if (key == GLFW_KEY_A && action == GLFW_PRESS)
-			global_angle[0] -= 0.1;
-		if (key == GLFW_KEY_W && action == GLFW_PRESS)
-			global_angle[1] += 0.1;
-		if (key == GLFW_KEY_S && action == GLFW_PRESS)
-			global_angle[1] -= 0.1;
 	}
 }
 
@@ -34,8 +26,6 @@ void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
 			global_angle[1] += incrementY;
 			global_startX = xpos;
 			global_startY = ypos;
-		}
-		else {
 		}
 	}
 }

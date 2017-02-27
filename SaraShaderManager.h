@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <vector>
 #include <gl\glew.h>
 #include <GLFW\glfw3.h>
 
@@ -9,10 +10,12 @@
 class SaraShaderManager {
 public:
 	SaraShaderManager( std::string vertexShaderFilename, std::string fragmentShaderFilename );
+	SaraShaderManager( std::string vertexShaderFilename, std::vector<std::string> fragmentShaderFilenameVector );
 	~SaraShaderManager();
 
 	void setupShaders();
 	void compileShaders();
+	void checkGlobalShd();
 
 	GLuint getPipeline();
 
@@ -28,6 +31,10 @@ private:
 	GLchar					*fragmentShaderSource;
 	std::string				vertexShaderFilename;
 	std::string				fragmentShaderFilename;
+	std::vector<std::string> fragmentShaderFilenameVector;
+
+	// controllo
+	int						currentFragShd;
 
 	// Shader Programs
 	GLuint					vertexShaderProgram;
