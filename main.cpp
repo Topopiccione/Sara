@@ -1,7 +1,3 @@
-// --------------------------------
-// Sara avvalora ricorsivi acronimi
-// --------------------------------
-
 // Richiede: GLEW, GLFW, AntTweakBar, OpenGL e poco altro...
 
 #include <gl\glew.h>
