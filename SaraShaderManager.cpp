@@ -74,12 +74,15 @@ void SaraShaderManager::compileShaders( void ) {
 	glGenProgramPipelines( 1, &mainPipeline );
 	glUseProgramStages( mainPipeline, GL_VERTEX_SHADER_BIT, vertexShaderProgram );
 	glUseProgramStages( mainPipeline, GL_FRAGMENT_SHADER_BIT, fragmentShaderProgram );
-	res_x_loc	= glGetUniformLocation( fragmentShaderProgram, "res_x" );
-	res_y_loc	= glGetUniformLocation( fragmentShaderProgram, "res_y" );
-	time_loc	= glGetUniformLocation( fragmentShaderProgram, "time" );
-	tex_loc		= glGetUniformLocation( fragmentShaderProgram, "tex" );
-	offc_loc	= glGetUniformLocation( fragmentShaderProgram, "Offc" );
-	angle_loc	= glGetUniformLocation( fragmentShaderProgram, "angle" );
+	res_x_loc		= glGetUniformLocation( fragmentShaderProgram, "res_x" );
+	res_y_loc		= glGetUniformLocation( fragmentShaderProgram, "res_y" );
+	time_loc		= glGetUniformLocation( fragmentShaderProgram, "time" );
+	tex_loc			= glGetUniformLocation( fragmentShaderProgram, "tex" );
+	offc_loc		= glGetUniformLocation( fragmentShaderProgram, "Offc" );
+	angle_loc		= glGetUniformLocation( fragmentShaderProgram, "angle" );
+	cameraOrg_loc	= glGetUniformLocation( fragmentShaderProgram, "cameraOrg" );
+	cameraTrg_loc	= glGetUniformLocation( fragmentShaderProgram, "cameraTrg" );
+	cameraUpd_loc	= glGetUniformLocation( fragmentShaderProgram, "cameraUpd" );
 }
 
 void SaraShaderManager::setUniforms( int resX, int resY, float time, int tex, float offc ) {
@@ -96,6 +99,15 @@ void SaraShaderManager::setUniforms( int resX, int resY, float time ) {
 	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
 	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
 	glProgramUniform2fv( fragmentShaderProgram, angle_loc, 1, SaraGlobal::angle );
+}
+
+void SaraShaderManager::setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd ) {
+	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
+	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
+	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
+	glProgramUniform3fv( fragmentShaderProgram, cameraOrg_loc, 1, glm::value_ptr(camOrg) );
+	glProgramUniform3fv( fragmentShaderProgram, cameraTrg_loc, 1, glm::value_ptr(camTrg) );
+	glProgramUniform3fv( fragmentShaderProgram, cameraUpd_loc, 1, glm::value_ptr(camUpd) );
 }
 
 

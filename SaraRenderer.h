@@ -8,10 +8,11 @@
 #include "SaraWindowManager.h"
 #include "SaraShaderManager.h"
 #include "SaraTweakBar.h"
+#include "SaraCamera.h"
 
 class SaraRenderer {
 public:
-	SaraRenderer( SaraWindowManager	* wndMgr, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader );
+	SaraRenderer( SaraWindowManager	* wndMgr, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraCamera * camera );
 	~SaraRenderer();
 
 	void mainDraw( bool postProcess );
@@ -29,6 +30,7 @@ private:
 	SaraShaderManager	*	mainShd;
 	SaraShaderManager	*	postProcShd;
 	SaraWindowManager	*	wndMgr;
+	SaraCamera			*	came;
 	SaraTweakBar			twb;
 
 	// FBO e VBO
