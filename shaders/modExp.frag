@@ -111,12 +111,63 @@ mat3 rotationXY( vec2 angl ) {
 	vec2 s = sin( angl.yx );
 	
 	// conti fatti a mano (le matrici non tornavano...)
-	return mat3(
+	return
+	mat3(
 		c.x*c.y, -s.x*c.y, s.y,
 		s.x, c.x, 0.0,
-		-c.x*s.y, s.x*s.y, c.y);
+		-c.x*s.y, s.x*s.y, c.y) 
+	;
 }
 
+
+vec4 qMult( vec4 A, vec4 B ) {
+	vec4 C;
+	C.x = A.w*B.x + A.x*B.w + A.y*B.z - A.z*B.y;
+	C.y = A.w*B.y - A.x*B.z + A.y*B.w + A.z*B.x;
+	C.z = A.w*B.z + A.x*B.y - A.y*B.x + A.z*B.w;
+	C.w = A.w*B.w - A.x*B.x - A.y*B.y - A.z*B.z;
+	return C;
+}
+
+vec4 qConj( vec4 quat ) {
+	return vec4(-quat.x, -quat.y, -quat.z, quat.w);
+}
+
+vec4 qNormalize( vec4 q ) {
+	float L = length(q);
+	return vec4( q.x/L, q.y/L, q.z/L, q.w/L );
+}
+
+vec4 quat_from_axis_angle(vec3 axis, float angle)
+{ 
+	vec4 qr;
+	float half_angle = (angle * 0.5) * 3.14159 / 180.0;
+	qr.x = axis.x * sin(half_angle);
+	qr.y = axis.y * sin(half_angle);
+	qr.z = axis.z * sin(half_angle);
+	qr.w = cos(half_angle);
+	return qr;
+}
+
+vec3 rotationQuat( vec2 angl, vec3 coord ) {
+	vec4 qx = vec4( sin(angl.y), 0.0, 0.0, cos(angl.y) );
+	vec4 qy = vec4( 0.0, sin(angl.x), 0.0, cos(angl.x) );
+	vec4 qrot = qNormalize( qMult( qx, qy ) );
+	vec4 tempq = qMult( qrot, vec4( coord, 0.0 ) );
+	return qMult( tempq, qConj(qrot) ).xyz;
+}
+
+mat3 QToRMat (vec4 q) 
+{
+  mat3 m;
+  float a1, a2, s;
+  s = q.w * q.w - 0.5;
+  m[0][0] = q.x * q.x + s;  m[1][1] = q.y * q.y + s;  m[2][2] = q.z * q.z + s;
+  a1 = q.x * q.y;  a2 = q.z * q.w;  m[0][1] = a1 + a2;  m[1][0] = a1 - a2;
+  a1 = q.x * q.z;  a2 = q.y * q.w;  m[2][0] = a1 + a2;  m[0][2] = a1 - a2;
+  a1 = q.y * q.z;  a2 = q.x * q.w;  m[1][2] = a1 + a2;  m[2][1] = a1 - a2;
+  return 2. * m;
+}
 
 void main()
 {
@@ -126,11 +177,48 @@ void main()
 	pixelPos.x *= resolution.x / resolution.y;
 	float t = time * 0.002;
 	
+	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
+	
+	vec3 cameraOrigin = vec3( 0.0, 0.0, 0.0 );
+	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
+	//vec4 roar = vec4( sin(0.1 * t), 0.0, 0.0, cos(0.2 * t));
+	//float theta = mod(time * 0.1, 360.0);
+	//vec4 roar = qNormalize( quat_from_axis_angle(vec3(.0,1.0,.0), theta) );
+	//vec4 roar = qNormalize( vec4(  0.0, 0.0, sin(theta * 0.01), cos(theta*0.01)) );
+	//mat3 rrot = QToRMat( roar );
+	//cameraOrigin = qMult( qMult( roar, vec4(cameraOrigin,0.0) ), qConj( roar ) ).xyz;
+	//cameraTarget = qMult( qMult( roar, vec4(cameraTarget,0.0) ), qConj( roar ) ).xyz;
+	//vec3 cameraOrigin = rotationQuat( angle, vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 ) );
+	//vec3 cameraTarget = rotationQuat( angle, vec3( 3.0, 0.0, 0.0 ) );
+	//cameraOrigin += (2.0 * cross(roar.xyz, cross(roar.xyz, cameraOrigin) + roar.w * cameraOrigin));
+	//cameraTarget += (2.0 * cross(roar.xyz, cross(roar.xyz, cameraTarget) + roar.w * cameraTarget));
+	//cameraOrigin = cameraOrigin * rrot;
+	//cameraTarget = cameraTarget * rrot;
+	//spaceUpDir = spaceUpDir * rrot;
+	//cameraOrigin = rotationQuat( angle, cameraOrigin );
+	
+	/*
+	cameraTarget = rotationQuat( angle, cameraTarget );
+	spaceUpDir = rotationQuat( angle, spaceUpDir );
+	*/
+	vec4 qx = vec4( sin(angle.y), 0.0, 0.0, cos(angle.y) );
+	vec4 tempq = qMult( qx, vec4( spaceUpDir, 0.0 ) );
+	spaceUpDir = qMult( tempq, qConj(qx) ).xyz;
+	
+	vec4 qy = vec4( 0.0, sin(angle.x), 0.0, cos(angle.x) );
+	tempq = qMult( qy, vec4( cameraTarget, 0.0 ) );
+	cameraTarget = qMult( tempq, qConj(qx) ).xyz;
+	
+	
+	
+	
+	/*
 	mat3 rot = rotationXY( angle );
 	
 	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
 	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 ) * rot;
 	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 ) * rot;
+	*/
 	
 	// Direzione in cui punta la camera ( versore ) = normalized cameraOrigin - cameraTarget
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );

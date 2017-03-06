@@ -28,8 +28,28 @@ void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
 		if (SaraGlobal::cameraMoving == true) {
 			incrementX = (xpos - SaraGlobal::startX) / 500.0;
 			incrementY = (ypos - SaraGlobal::startY) / 500.0;
-			SaraGlobal::angle[0] += incrementX;
-			SaraGlobal::angle[1] += incrementY;
+			SaraGlobal::angle[0] += incrementX;	// pitch
+			/*if (SaraGlobal::angle[0] > 3.14f) {
+				SaraGlobal::angle[0] -= 3.14f;
+			}
+			else if (SaraGlobal::angle[0] < -3.14f) {
+				SaraGlobal::angle[0] += 3.14f;
+			}*/
+
+			/*if (SaraGlobal::angle[1] > 0.785 && SaraGlobal::angle[1] < 2.565 || (SaraGlobal::angle[1] < -0.785 && SaraGlobal::angle[1] > -2.565)) {
+				SaraGlobal::angle[1] -= incrementY; // heading
+			}
+			else {*/
+				SaraGlobal::angle[1] += incrementY;
+			//}
+			//Check bounds for the camera heading
+			/*if (SaraGlobal::angle[1] > 3.14f) {
+				SaraGlobal::angle[1] -= 3.14f;
+			}
+			else if (SaraGlobal::angle[1] < -3.14f) {
+				SaraGlobal::angle[1] += 3.14f;
+			}*/
+
 			SaraGlobal::startX = xpos;
 			SaraGlobal::startY = ypos;
 		}
