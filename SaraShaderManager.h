@@ -4,6 +4,8 @@
 #include <vector>
 #include <gl\glew.h>
 #include <GLFW\glfw3.h>
+#include <glm\vec3.hpp>
+#include <glm\gtc\type_ptr.hpp>
 
 #include "Sara.h"
 
@@ -20,6 +22,7 @@ public:
 	GLuint getPipeline();
 
 	void	setUniforms( int resX, int resY, float time );
+	void	setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd );
 	void	setUniforms( int resX, int resY, float time, int tex, float offc );
 
 
@@ -49,6 +52,10 @@ private:
 	GLuint					tex_loc;
 	GLuint					offc_loc;
 	GLuint					angle_loc;
+
+	GLuint					cameraOrg_loc;
+	GLuint					cameraTrg_loc;
+	GLuint					cameraUpd_loc;
 
 	// coordinate rotazione
 	float					rotaz[3];

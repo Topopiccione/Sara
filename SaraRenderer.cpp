@@ -1,9 +1,10 @@
 #include "SaraRenderer.h"
 
-SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader ) :
+SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraCamera * cam ) :
 			wndMgr( windowManager ),
 			mainShd( mainShader ),
 			postProcShd( postProcessShader ),
+			came( cam ),
 			twb( "SaraParams" ) {
 
 	const GLubyte* renderer = glGetString( GL_RENDERER ); 
@@ -37,6 +38,8 @@ void SaraRenderer::update( float newTime ) {
 }
 
 void SaraRenderer::update() {
+	if (SaraGlobal::cameraMoving)
+		came->update();
 	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
 	mainShd->checkGlobalShd();
 }
@@ -50,7 +53,8 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 
 	glBindProgramPipeline( mainShd->getPipeline() );
 
-	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
+	//mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
+	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );

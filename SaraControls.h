@@ -2,6 +2,7 @@
 #include <iostream>
 #include <gl\glew.h>
 #include <GLFW\glfw3.h>
+#include <glm\vec2.hpp>
 #include <AntTweakBar.h>
 #include "Sara.h"
 

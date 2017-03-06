@@ -8,6 +8,7 @@
 #include "SaraRenderer.h"
 #include "SaraShaderManager.h"
 #include "SaraTweakBar.h"
+#include "SaraCamera.h"
 #include "SaraControls.h"
 
 #define SHDPATH "C:\\Users\\User\\Documents\\git\\Sara\\"
@@ -57,7 +58,9 @@ int main( void ) {
 
 	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
-	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader );
+	SaraCamera mainCamera;
+
+	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader, &mainCamera );
 
 	glfwSetKeyCallback( wndMgr.getWndw(), key_callback );
 	glfwSetCursorPosCallback( wndMgr.getWndw(), cursor_position_callback );

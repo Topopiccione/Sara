@@ -25,30 +25,23 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
 	double incrementX, incrementY;
 	if (!TwEventMousePosGLFW( xpos, ypos )) {
-		if (SaraGlobal::cameraMoving == true) {
+		/*if (SaraGlobal::cameraMoving == true) {
 			incrementX = (xpos - SaraGlobal::startX) / 500.0;
 			incrementY = (ypos - SaraGlobal::startY) / 500.0;
 			SaraGlobal::angle[0] += incrementX;	// pitch
-			/*if (SaraGlobal::angle[0] > 3.14f) {
-				SaraGlobal::angle[0] -= 3.14f;
-			}
-			else if (SaraGlobal::angle[0] < -3.14f) {
-				SaraGlobal::angle[0] += 3.14f;
-			}*/
+			SaraGlobal::angle[1] += incrementY;
+			SaraGlobal::startX = xpos;
+			SaraGlobal::startY = ypos;
+		}*/
+		if (SaraGlobal::cameraMoving == true) {
+			glm::vec2 mouse_delta = glm::vec2( xpos, ypos ) - glm::vec2( SaraGlobal::startX, SaraGlobal::startY);
 
-			/*if (SaraGlobal::angle[1] > 0.785 && SaraGlobal::angle[1] < 2.565 || (SaraGlobal::angle[1] < -0.785 && SaraGlobal::angle[1] > -2.565)) {
-				SaraGlobal::angle[1] -= incrementY; // heading
-			}
-			else {*/
-				SaraGlobal::angle[1] += incrementY;
-			//}
-			//Check bounds for the camera heading
-			/*if (SaraGlobal::angle[1] > 3.14f) {
-				SaraGlobal::angle[1] -= 3.14f;
-			}
-			else if (SaraGlobal::angle[1] < -3.14f) {
-				SaraGlobal::angle[1] += 3.14f;
-			}*/
+			//notice that we reduce the sensitvity
+			const float mouseX_Sensitivity = 0.0020f;
+			const float mouseY_Sensitivity = 0.0020f;
+
+			SaraGlobal::angle[0] = mouseX_Sensitivity * mouse_delta.x;
+			SaraGlobal::angle[1] = mouseY_Sensitivity * mouse_delta.y;
 
 			SaraGlobal::startX = xpos;
 			SaraGlobal::startY = ypos;

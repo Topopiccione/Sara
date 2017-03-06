@@ -6,6 +6,9 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
+uniform vec3 cameraOrg;
+uniform vec3 cameraTrg;
+uniform vec3 cameraUpd;
 uniform vec2 angle;
 
 const int MAX_ITER = 100;
@@ -177,10 +180,16 @@ void main()
 	pixelPos.x *= resolution.x / resolution.y;
 	float t = time * 0.002;
 	
+	///////// VECCHIA VERSIONE CON MATRICE DI ROTAZIONE
+	/*mat3 rot = rotationXY( angle );
 	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
+	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 ) * rot;
+	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 ) * rot;
+	*/
 	
-	vec3 cameraOrigin = vec3( 0.0, 0.0, 0.0 );
-	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
+	//vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
+	//vec3 cameraOrigin = vec3( 0.0, 0.0, 0.0 );
+	//vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
 	//vec4 roar = vec4( sin(0.1 * t), 0.0, 0.0, cos(0.2 * t));
 	//float theta = mod(time * 0.1, 360.0);
 	//vec4 roar = qNormalize( quat_from_axis_angle(vec3(.0,1.0,.0), theta) );
@@ -197,28 +206,26 @@ void main()
 	//spaceUpDir = spaceUpDir * rrot;
 	//cameraOrigin = rotationQuat( angle, cameraOrigin );
 	
-	/*
-	cameraTarget = rotationQuat( angle, cameraTarget );
-	spaceUpDir = rotationQuat( angle, spaceUpDir );
-	*/
+	
+	////////// VERSIONE CON ANGLE
+	/*vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
+	vec3 cameraOrigin = vec3( 0.0, 0.0, 0.0 );
+	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 );
 	vec4 qx = vec4( sin(angle.y), 0.0, 0.0, cos(angle.y) );
 	vec4 tempq = qMult( qx, vec4( spaceUpDir, 0.0 ) );
 	spaceUpDir = qMult( tempq, qConj(qx) ).xyz;
 	
 	vec4 qy = vec4( 0.0, sin(angle.x), 0.0, cos(angle.x) );
 	tempq = qMult( qy, vec4( cameraTarget, 0.0 ) );
-	cameraTarget = qMult( tempq, qConj(qx) ).xyz;
+	cameraTarget = qMult( tempq, qConj(qx) ).xyz;*/
+	///////////
 	
-	
-	
-	
-	/*
-	mat3 rot = rotationXY( angle );
-	
-	vec3 spaceUpDir   = vec3( 0.0, 1.0, 0.0 );
-	vec3 cameraOrigin = vec3( sin(t / 5.0) * 0.75, - cos(t / 3.0) * 0.5, 0.5 ) * rot;
-	vec3 cameraTarget = vec3( 3.0, 0.0, 0.0 ) * rot;
-	*/
+
+	/////////// VERSIONE CON 3 VEC3
+	vec3 spaceUpDir   = cameraUpd;
+	vec3 cameraOrigin = cameraOrg;
+	vec3 cameraTarget = cameraTrg;
+	///////////
 	
 	// Direzione in cui punta la camera ( versore ) = normalized cameraOrigin - cameraTarget
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
