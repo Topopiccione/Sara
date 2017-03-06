@@ -6,7 +6,10 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
-uniform vec2 angle;
+//uniform vec2 angle;
+uniform vec3 cameraOrg;
+uniform vec3 cameraTrg;
+uniform vec3 cameraUpd;
 
 
 // uniform float time;
@@ -103,16 +106,25 @@ void main()
     m-=.5;
 
     // camera
-
+	/*
     vec3 ro = zoom*vec3(4.) * rotationXY( angle );
     ro.yz*=rot(m.y);
     ro.xz*=rot(m.x+ 0.0001*time);
-    vec3 ta = vec3( 0.0, 0.0, 0.0 ) * rotationXY( angle );
+    vec3 ta = vec3( 0.0, 0.0, 0.0 );
     vec3 ww = normalize( ta - ro );
     vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
     vec3 vv = normalize( cross(uu,ww));
     vec3 rd = normalize( p.x*uu + p.y*vv + 4.0*ww );
+*/
 
+	vec3 ro = zoom*vec3(6.) * cameraTrg;
+    ro.yz*=rot(m.y);
+    ro.xz*=rot(m.x+ 0.0001*time);
+    vec3 ta = vec3( 0.0, 0.0, 0.0 );
+    vec3 ww = normalize( ro - ta );
+    vec3 uu = normalize( cross(ww,cameraUpd ) );
+    vec3 vv = normalize( cross(uu,ww));
+    vec3 rd = normalize( p.x*uu + p.y*vv + 4.0*ww );
     
     vec2 tmm = iSphere( ro, rd, vec4(0.,0.,0.,2.) );
 

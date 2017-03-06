@@ -17,32 +17,16 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 
 /*void character_callback( GLFWwindow* window, unsigned int codepoint ) {
 	if (!TwEventCharGLFW(codepoint, NULL)) {
-
 	}
 }*/
 
 
 void cursor_position_callback( GLFWwindow* window, double xpos, double ypos ) {
-	double incrementX, incrementY;
 	if (!TwEventMousePosGLFW( xpos, ypos )) {
-		/*if (SaraGlobal::cameraMoving == true) {
-			incrementX = (xpos - SaraGlobal::startX) / 500.0;
-			incrementY = (ypos - SaraGlobal::startY) / 500.0;
-			SaraGlobal::angle[0] += incrementX;	// pitch
-			SaraGlobal::angle[1] += incrementY;
-			SaraGlobal::startX = xpos;
-			SaraGlobal::startY = ypos;
-		}*/
 		if (SaraGlobal::cameraMoving == true) {
-			glm::vec2 mouse_delta = glm::vec2( xpos, ypos ) - glm::vec2( SaraGlobal::startX, SaraGlobal::startY);
-
-			//notice that we reduce the sensitvity
-			const float mouseX_Sensitivity = 0.0020f;
-			const float mouseY_Sensitivity = 0.0020f;
-
-			SaraGlobal::angle[0] = mouseX_Sensitivity * mouse_delta.x;
-			SaraGlobal::angle[1] = mouseY_Sensitivity * mouse_delta.y;
-
+			const float mouseSens = 0.0020f;
+			SaraGlobal::angle[0] = mouseSens * ( xpos - SaraGlobal::startX );
+			SaraGlobal::angle[1] = mouseSens * ( ypos - SaraGlobal::startY );
 			SaraGlobal::startX = xpos;
 			SaraGlobal::startY = ypos;
 		}

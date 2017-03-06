@@ -3,8 +3,10 @@
 uniform int res_x;
 uniform int res_y;
 uniform float time;
-uniform vec2 angle;
-
+//uniform vec2 angle;
+uniform vec3 cameraOrg;
+uniform vec3 cameraTrg;
+uniform vec3 cameraUpd;
 
 float sdBox( vec3 p, vec3 b )
 {
@@ -84,11 +86,18 @@ void main()
 {
 	vec2 resolution = vec2( res_x, res_y );
     vec2 pos = (gl_FragCoord.xy*2.0 - resolution.xy) / resolution.y;
-    vec3 camPos = vec3(-0.4,1.0,3.0) * rotationXY( angle );
-    vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05) * rotationXY( angle ));
+	
+	
+    vec3 camPos = vec3(-0.4,1.0,3.0-time*0.005) + cameraOrg;
+	vec3 camTrg = cameraTrg;
+	vec3 camDir = normalize( cameraTrg - cameraOrg );
+	vec3 camSide = normalize( cross(camDir, cameraUpd) );
+	vec3 camUp   = normalize( cross( camSide, camDir ) );
+	
+    /*vec3 camDir = normalize(vec3(-0.2, 0.5, 0.05) * rotationXY( angle ));
     camPos -=  vec3(0.0,0.0,time*0.005);
     vec3 camUp  = normalize(vec3(0.0, 1.0, 0.0));
-    vec3 camSide = cross(camDir, camUp);
+    vec3 camSide = cross(camDir, camUp);*/
     float focus = 1.8;
 
     vec3 rayDir = normalize(camSide*pos.x + camUp*pos.y + camDir*focus);	    
