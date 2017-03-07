@@ -10,31 +10,22 @@ uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
 
-mat3 rotationXY( vec2 angl ) {
-	vec2 c = cos( -angl.yx );
-	vec2 s = sin( -angl.yx );
-	// Variante originale
-	return mat3(
-		c.y, 0, -s.y,
-		s.y*s.x, c.x, c.y*s.x,
-		s.y*c.x, -s.x, c.y*c.x);
-}
 
 vec2 resolution = vec2(res_x, res_y);
 vec2 mouse = vec2(0.5, 0.5);
 float timee = time * 0.005;
 void main( void ) {
+	/////////// Originale
 	//vec3 pos = vec3(0,0,-16) * rotationXY( angle );
 	//vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.xy, 1.) * rotationXY( angle ));
 	
-	vec3 pos = vec3(-1,-1,-16) * cameraTrg;
+	vec3 pos = vec3(12.) * cameraTrg;
 	vec3 ww = normalize( cameraOrg - pos );
 	vec3 uu = normalize( cross(ww,cameraUpd) );
     vec3 vv = normalize( cross(uu,ww) );
 	vec2 pp = (gl_FragCoord.xy - resolution.xy*.5) / resolution.xy;
 	vec3 dir = normalize( pp.x*uu + pp.y*vv + ww );
 	
-	//vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.xy, 1.));
 	vec3 colour = vec3(.05,.1,.15);
 	for (float y = 5.; y >= -5.; y--) {
 		for (float x = -5.; x <= 5.; x++) {

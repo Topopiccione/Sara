@@ -6,15 +6,9 @@ out vec4 color;
 uniform int res_x;
 uniform int res_y;
 uniform float time;
-//uniform vec2 angle;
 uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
-
-
-// uniform float time;
-// uniform vec2 mouse;
-// uniform vec2 resolution;
 
 // The Following Code is a modified version of https://www.shadertoy.com/view/MtX3Ws#
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
@@ -30,7 +24,7 @@ mat2 rot(float a) {
 	return mat2(cos(a),sin(a),-sin(a),cos(a));	
 }
 
-vec2 iSphere( in vec3 ro, in vec3 rd, in vec4 sph )//from iq
+vec2 iSphere( in vec3 ro, in vec3 rd, in vec4 sph )
 {
 	vec3 oc = ro - sph.xyz;
 	float b = dot( oc, rd );
@@ -73,26 +67,11 @@ vec3 raymarch( in vec3 ro, vec3 rd, vec2 tminmax )
         
         c = map(ro+t*rd);               
         
-	//float sc = mouse.x;
 	float sc = 0.5;
         col = .99*col+ .1*vec3(1.9*c*c*sc, 1.35*c*c*sc, 1.5*c*sc);//green	
         //col = .99*col+ .08*vec3(c*c*c, c*c, c);//blue
     }    
     return col;
-}
-
-
-mat3 rotationXY( vec2 angl ) {
-	vec2 c = cos( -angl.yx );
-	vec2 s = sin( angl.yx );
-	return mat3(
-		c.y, 0, -s.y,
-		s.y*s.x, c.x, c.y*s.x,
-		s.y*c.x, -s.x, c.y*c.x);
-	return mat3(
-		c.x*c.y, -s.x*c.y, s.y,
-		s.x, c.x, 0.0,
-		-c.x*s.y, s.x*s.y, c.y);
 }
 
 void main()
@@ -102,20 +81,18 @@ void main()
     vec2 p = -1.0 + 2.0 * q;
     p.x *= resolution.x/resolution.y;
     vec2 m = vec2(0.);
-    //if( mouse.z>0.0 )m = mouse.xy/resolution.xy*3.14;
     m-=.5;
 
     // camera
-	/*
-    vec3 ro = zoom*vec3(4.) * rotationXY( angle );
+	////////// Originale
+    /*vec3 ro = zoom*vec3(4.) * rotationXY( angle );
     ro.yz*=rot(m.y);
     ro.xz*=rot(m.x+ 0.0001*time);
     vec3 ta = vec3( 0.0, 0.0, 0.0 );
     vec3 ww = normalize( ta - ro );
     vec3 uu = normalize( cross(ww,vec3(0.0,1.0,0.0) ) );
     vec3 vv = normalize( cross(uu,ww));
-    vec3 rd = normalize( p.x*uu + p.y*vv + 4.0*ww );
-*/
+    vec3 rd = normalize( p.x*uu + p.y*vv + 4.0*ww );*/
 
 	vec3 ro = zoom*vec3(6.) * cameraTrg;
     ro.yz*=rot(m.y);
@@ -140,10 +117,8 @@ void main()
     //}
 	
 	// shade
-    
-    col =  .5 *(log(1.+col));
+	col =  .5 *(log(1.+col));
     col = clamp(col,0.,1.);
-    //gl_FragColor = vec4( col, 1.0 );
 	color = vec4( col, 1.0 );
 
 }

@@ -25,7 +25,7 @@ float	SaraGlobal::angle[2] = { 0.0f, 0.0f };
 double	SaraGlobal::startX = 0.0;
 double	SaraGlobal::startY = 0.0;
 int		SaraGlobal::shaderNumber = 0;
-float	SaraGlobal::postProcVar = 2.20;
+float	SaraGlobal::postProcVar = 0.75;
 
 
 int main( void ) {

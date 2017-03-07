@@ -7,7 +7,7 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 			came( cam ),
 			twb( "SaraParams" ) {
 
-	const GLubyte* renderer = glGetString( GL_RENDERER ); 
+	const GLubyte* renderer = glGetString( GL_RENDERER );
 	const GLubyte* version = glGetString( GL_VERSION );
 	std::cout << "Renderer: " << renderer << std::endl;
 	std::cout << "OpenGL version supported: " << version << std::endl;

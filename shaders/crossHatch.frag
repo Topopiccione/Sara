@@ -9,7 +9,7 @@ uniform int res_y;
 uniform float Offc;
 uniform float time;
 
-void main(void)
+void main2(void)
 {
 	vec2 texCoord = gl_FragCoord.xy / vec2( res_x, res_y );
 	vec2 normCoord = 2.0 * texCoord - 1.0;
@@ -24,7 +24,7 @@ void main(void)
 	color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
 }
 
-void main2(void)
+void main(void)
 {
 
 	float xx = gl_FragCoord.x;

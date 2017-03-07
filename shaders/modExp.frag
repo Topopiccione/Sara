@@ -113,11 +113,9 @@ void main()
 	pixelPos.x *= resolution.x / resolution.y;
 	float t = time * 0.002;
 	
-	/////////// VERSIONE CON 3 VEC3
 	vec3 spaceUpDir   = cameraUpd;
 	vec3 cameraOrigin = cameraOrg;
 	vec3 cameraTarget = cameraTrg;
-	///////////
 	
 	// Direzione in cui punta la camera ( versore ) = normalized cameraOrigin - cameraTarget
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
