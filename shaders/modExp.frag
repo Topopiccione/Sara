@@ -164,7 +164,8 @@ void main()
 	// colore finale =  somma delle componenti di diffusione e riflessione
 	float colour = diffuse + specular;
 
-	float shdw = shadow(pos, normalize(vec3(0.5,1.0,0.0)), 0.1, 0.1, 15.0);
+	//float shdw = shadow(pos, normalize(vec3(0.5,1.0,0.0)), 0.1, 0.1, 15.0);
+	float shdw = shadow(pos, normalize(-rayDir), 0.1, 0.1, 15.0);
 	colour += shdw * 1.75;
 
 	float lenPos = length(pos);
