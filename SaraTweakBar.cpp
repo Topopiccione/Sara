@@ -15,9 +15,10 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 		{ 1, "massive clod" },
 		{ 2, "palline" },
 		{ 3, "biglia" },
-		{ 4, "piloni" }
+		{ 4, "piloni" },
+		{ 5, "procTex_vor" }
 	};
-	TwType shadNames = TwDefineEnum( "ShaderNames", shaderNames, 5 );
+	TwType shadNames = TwDefineEnum( "ShaderNames", shaderNames, 6 );
 
 	//TwAddVarRW( bar, "CameraDir", TW_TYPE_DIR3F, &global_cameraDirection,
 	//	" label='Camera direction' opened=true help='Cambia punto di vista' " );

@@ -51,16 +51,19 @@ int main( void ) {
 		SHDPATH + std::string( "shaders\\massiveClod.frag" ),
 		SHDPATH + std::string( "shaders\\quadretti.frag" ),
 		SHDPATH + std::string( "shaders\\test3.frag" ),
-		SHDPATH + std::string( "shaders\\piloni.frag" ) };
+		SHDPATH + std::string( "shaders\\piloni.frag" ),
+		SHDPATH + std::string( "shaders\\procTexture_voronoi.frag") };
 		//SHDPATH + std::string( "shaders\\superstructure.frag" )
 
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );
 
 	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
+	SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_voronoi.frag" ) );
+
 	SaraCamera mainCamera;
 
-	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader, &mainCamera );
+	SaraRenderer mainRenderer( &wndMgr, &mainShader, &postProcShader, &procTexShader, &mainCamera );
 
 	glfwSetKeyCallback( wndMgr.getWndw(), key_callback );
 	glfwSetCursorPosCallback( wndMgr.getWndw(), cursor_position_callback );
@@ -68,6 +71,8 @@ int main( void ) {
 	glfwSetScrollCallback( wndMgr.getWndw(), scroll_callback );
 	glfwSetInputMode( wndMgr.getWndw(), GLFW_STICKY_MOUSE_BUTTONS, 0 );
 	glfwSetCharCallback( wndMgr.getWndw(), (GLFWcharfun)TwEventCharGLFW );
+
+	bool drawProcTex = true;
 	
 	// LOOP
 	while (!glfwWindowShouldClose( wndMgr.getWndw() )) {
@@ -79,10 +84,16 @@ int main( void ) {
 		}
 
 		mainRenderer.update();
+		if (drawProcTex) {
+			mainRenderer.procTexDraw();
+			drawProcTex = false;
+		}
 		mainRenderer.mainDraw( SaraGlobal::postProcess );
 		
 		glfwPollEvents();
 		glfwSwapBuffers( wndMgr.getWndw() );
+
+
 	}
 	
 	// close GL context and any other GLFW resources

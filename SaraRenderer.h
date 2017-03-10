@@ -12,16 +12,17 @@
 
 class SaraRenderer {
 public:
-	SaraRenderer( SaraWindowManager	* wndMgr, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraCamera * camera );
+	SaraRenderer( SaraWindowManager	* wndMgr, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraShaderManager * procTexShader, SaraCamera * camera );
 	~SaraRenderer();
 
 	void mainDraw( bool postProcess );
 	void fboDraw();
+	void procTexDraw();
 	void update( float newTime );
 	void update( void );
 
 private:
-	void setupFBO( void );
+	void setupFBO( GLuint * obj, GLuint * objTex );
 	void setupVBO( void );
 
 	std::clock_t start;
@@ -29,6 +30,7 @@ private:
 
 	SaraShaderManager	*	mainShd;
 	SaraShaderManager	*	postProcShd;
+	SaraShaderManager	*	procTexShd;
 	SaraWindowManager	*	wndMgr;
 	SaraCamera			*	came;
 	SaraTweakBar			twb;
@@ -36,6 +38,8 @@ private:
 	// FBO e VBO
 	GLuint					frameBufferObj;
 	GLuint					frameBufferObjTex;
+	GLuint					procTextureObj;
+	GLuint					procTextureObjTex;
 	GLuint					vao, vbo, ibo;
 
 	// Variabili di rendering
