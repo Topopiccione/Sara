@@ -51,7 +51,9 @@ int main( void ) {
 		SHDPATH + std::string( "shaders\\massiveClod.frag" ),
 		SHDPATH + std::string( "shaders\\quadretti.frag" ),
 		SHDPATH + std::string( "shaders\\test3.frag" ),
-		SHDPATH + std::string( "shaders\\piloni.frag" ) };
+		SHDPATH + std::string( "shaders\\piloni.frag" ),
+		SHDPATH + std::string( "shaders\\hills.frag" ), 
+		SHDPATH + std::string( "shaders\\greymandelbulb.frag" ) };
 		//SHDPATH + std::string( "shaders\\superstructure.frag" )
 
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );

@@ -1,15 +1,19 @@
-#version 120
+#version 330 core
 
+in vec2 uv;
+out vec4 color;
+
+uniform int res_x;
+uniform int res_y;
 uniform float time;
-uniform float res_x;
-uniform float res_y;
-uniform float saturation;
-uniform float whiteTransition;
+uniform vec3 cameraOrg;
+uniform vec3 cameraTrg;
+uniform vec3 cameraUpd;
 
 vec2 surfacePosition = gl_FragCoord.xy / vec2( res_x, res_y );
 
 vec3   iResolution = vec3(res_x, res_y, 1.0);
-float  iGlobalTime = 0.2*time;
+float  iGlobalTime = 0.002*time;
 
 // http://www.fractalforums.com/movies-showcase-%28rate-my-movie%29/very-rare-deep-sea-fractal-creature/
 
@@ -91,11 +95,11 @@ void main(void) {
 	dir.yz=dir.yz*rot;
 	from.yz=from.yz*rot;
 	
-	float col=raymarch(from,dir) + 0.8 * whiteTransition; 
+	float col=raymarch(from,dir);// + 0.8 * whiteTransition; 
 	iGlobalTime = t *( 1.0 + fract(iGlobalTime));
 
 	
-	vec3 finalColor = vec3( col, col, col ) * saturation + normalize ( vec3( col ) ) * (1.0 - saturation);
+	vec3 finalColor = vec3( col, col, col );// * saturation + normalize ( vec3( col ) ) * (1.0 - saturation);
 	gl_FragColor =  vec4( finalColor, 1.0 );
 	
 	//vec2 sp = gl_FragCoord.xy / vec2( res_x, res_y );
