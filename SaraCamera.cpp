@@ -21,6 +21,7 @@ void SaraCamera::update() {
 	glm::quat headnQuat = glm::angleAxis( camHeadn, upDrct );
 	glm::quat rotQuat   = glm::normalize( glm::cross( pitchQuat, headnQuat ) );
 
+	//target = rotQuat * target * glm::conjugate( rotQuat );
 	target = rotQuat * target * glm::conjugate( rotQuat );
 	upDrct = rotQuat * upDrct * glm::conjugate( rotQuat );
 
