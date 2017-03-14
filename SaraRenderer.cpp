@@ -1,9 +1,10 @@
 #include "SaraRenderer.h"
 
-SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraCamera * cam ) :
+SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager * mainShader, SaraShaderManager * postProcessShader, SaraShaderManager * procTexShader, SaraCamera * cam ) :
 			wndMgr( windowManager ),
 			mainShd( mainShader ),
 			postProcShd( postProcessShader ),
+			procTexShd( procTexShader ),
 			came( cam ),
 			twb( "SaraParams" ) {
 
@@ -12,7 +13,8 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 	std::cout << "Renderer: " << renderer << std::endl;
 	std::cout << "OpenGL version supported: " << version << std::endl;
 
-	setupFBO();
+	setupFBO( &frameBufferObj, &frameBufferObjTex );
+	setupFBO( &procTextureObj, &procTextureObjTex );
 	setupVBO();
 
 	glEnable( GL_TEXTURE_2D );
@@ -45,7 +47,7 @@ void SaraRenderer::update() {
 }
 
 void SaraRenderer::mainDraw( bool postProcess ) {
-	if (postProcess)
+	if (postProcess) 
 		glBindFramebuffer( GL_FRAMEBUFFER, frameBufferObj );
 
 	glClearColor( 1.0, 0.0, 0.0, 1.0 );
@@ -61,7 +63,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	glBindVertexArray( 0 );
 
 	glBindProgramPipeline( 0 );
-
+	
 	if (postProcess) {
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		fboDraw();
@@ -69,11 +71,10 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 
 	if (SaraGlobal::windowResize) {
 		twb.resize();
-		setupFBO();
+		setupFBO( &frameBufferObj, &frameBufferObjTex );
 		SaraGlobal::windowResize = false;
 	}
 	twb.draw();
-
 }
 
 void SaraRenderer::fboDraw( void ) {
@@ -83,7 +84,8 @@ void SaraRenderer::fboDraw( void ) {
 	glBindProgramPipeline( postProcShd->getPipeline() );
 
 	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
+	//glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
+	glBindTexture( GL_TEXTURE_2D, procTextureObjTex );
 
 	postProcShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, 0, SaraGlobal::postProcVar );
 
@@ -94,11 +96,32 @@ void SaraRenderer::fboDraw( void ) {
 	glBindProgramPipeline( 0 );
 }
 
+void SaraRenderer::procTexDraw() {
+	glBindFramebuffer( GL_FRAMEBUFFER, procTextureObj );
 
-void SaraRenderer::setupFBO( void ) {
+	glClearColor( 1.0, 0.0, 0.0, 1.0 );
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	glBindProgramPipeline( procTexShd->getPipeline() );
+
+	procTexShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
+
+	glBindVertexArray( vao );
+	glDrawArrays( GL_QUADS, 0, 4 );
+	glBindVertexArray( 0 );
+
+	glBindProgramPipeline( 0 );
+
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+}
+
+
+
+
+void SaraRenderer::setupFBO( GLuint * obj, GLuint * objTex ) {
 	// genero texture da collegare al FBO
-	glGenTextures( 1, &frameBufferObjTex );
-	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
+	glGenTextures( 1, objTex );
+	glBindTexture( GL_TEXTURE_2D, *objTex );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -111,9 +134,9 @@ void SaraRenderer::setupFBO( void ) {
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
 	// creazione FBO
-	glGenFramebuffers( 1, &frameBufferObj );
-	glBindFramebuffer( GL_FRAMEBUFFER, frameBufferObj );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, frameBufferObjTex, 0 );
+	glGenFramebuffers( 1, obj );
+	glBindFramebuffer( GL_FRAMEBUFFER, *obj );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, *objTex, 0 );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 }
 

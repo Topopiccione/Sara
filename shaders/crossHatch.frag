@@ -9,7 +9,13 @@ uniform int res_y;
 uniform float Offc;
 uniform float time;
 
-void main2(void)
+// Flat texture render
+void main( void ) {
+	vec2 texCoord = vec2( uv.s, (1.0 - uv.t) );
+	color = vec4( texture2D( tex, texCoord ).xyz, 1.0) * 1.5;
+}
+
+void main3(void)
 {
 	vec2 texCoord = gl_FragCoord.xy / vec2( res_x, res_y );
 	vec2 normCoord = 2.0 * texCoord - 1.0;
@@ -24,7 +30,7 @@ void main2(void)
 	color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
 }
 
-void main(void)
+void main2(void)
 {
 
 	float xx = gl_FragCoord.x;

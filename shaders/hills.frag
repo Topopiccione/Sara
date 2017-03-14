@@ -251,7 +251,6 @@ vec3 PostEffects(vec3 rgb, vec2 xy) {
 //--------------------------------------------------------------------------
 void main(void) {
 	//float gTime = (time*5.0+2352.0)*.006;
-	//float gTime = (time*5.0+2952.0)*.006;
 	float gTime = time * 0.00005;
     vec2 xy = gl_FragCoord.xy / vec2( res_x, res_y );
 	vec2 uv = (-1.0 + 2.0 * xy) * vec2( res_x / res_y, 1.0);
