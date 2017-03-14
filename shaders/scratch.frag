@@ -9,6 +9,7 @@ uniform float time;
 uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
+uniform sampler2D tex;
 
 const int MAX_ITER = 50;
 const float MAX_DIST = 35.0;
@@ -50,13 +51,6 @@ float repeat(float coord, float spacing) {
 float repeatAli(float coord, float spacing) {
     return mod(coord + 0.1, spacing) - spacing*0.5;
 }
-/*
-vec2 repeat2D( vec2 coord, vec2 spacing ) {
-	vec2 p;
-	p = mod(coord.y, spacing.y) - spacing.x * 0.5;
-	return p;
-}*/
-
 vec2 repeatAng(vec2 p, float n) {
     float ang = 2.0*3.14/n;
     float sector = floor(atan(p.x, p.y)/ang + 0.5);
@@ -104,6 +98,16 @@ float singoloPennello( vec3 pos ) {
 	pos.z = repeat( pos.z, 0.2 );
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
+
+/////// Calcolo del colore: lettura da texture
+vec4 texcube( sampler2D sam, in vec3 p, in vec3 n ) {
+	vec4 x = texture( sam, p.yz );
+	vec4 y = texture( sam, p.zx );
+	vec4 z = texture( sam, p.yx );
+    vec3 a = abs(n);
+	return (x*a.x + y*a.y + z*a.z) / (a.x + a.y + a.z);
+}
+
 
 
 float distFunct( vec3 pos ) {
@@ -181,7 +185,12 @@ void main() {
 	
 	float lenPos = length(pos);
 	
-	color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
+	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
+	vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
+    vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
+	color = vec4( colour, 1.0 );
+	
+	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
 	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
 	
 }

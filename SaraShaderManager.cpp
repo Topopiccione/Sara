@@ -110,6 +110,16 @@ void SaraShaderManager::setUniforms( int resX, int resY, float time, glm::vec3 c
 	glProgramUniform3fv( fragmentShaderProgram, cameraUpd_loc, 1, glm::value_ptr(camUpd) );
 }
 
+void SaraShaderManager::setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd, int tex ) {
+	glProgramUniform1i( fragmentShaderProgram, res_x_loc, resX );
+	glProgramUniform1i( fragmentShaderProgram, res_y_loc, resY );
+	glProgramUniform1f( fragmentShaderProgram, time_loc, time );
+	glProgramUniform1i( fragmentShaderProgram, tex_loc, tex );
+	glProgramUniform3fv( fragmentShaderProgram, cameraOrg_loc, 1, glm::value_ptr( camOrg ) );
+	glProgramUniform3fv( fragmentShaderProgram, cameraTrg_loc, 1, glm::value_ptr( camTrg ) );
+	glProgramUniform3fv( fragmentShaderProgram, cameraUpd_loc, 1, glm::value_ptr( camUpd ) );
+}
+
 
 GLchar* SaraShaderManager::filetobuf( const char *file ) {
 	FILE *fptr;
