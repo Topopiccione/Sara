@@ -13,8 +13,8 @@ uniform vec3 cameraUpd;
 const int MAX_ITER = 50;
 const float MAX_DIST = 35.0;
 const float EPSILON  = 0.001;
-const float fieldOfView = 1.5;
-const float zoom = 1.6;
+const float fieldOfView = 0.5;
+const float zoom = 0.5;
 
 
 /// Primitive
@@ -47,6 +47,16 @@ vec2 rotate(vec2 p, float ang) {
 float repeat(float coord, float spacing) {
     return mod(coord, spacing) - spacing*0.5;
 }
+float repeatAli(float coord, float spacing) {
+    return mod(coord + 0.1, spacing) - spacing*0.5;
+}
+/*
+vec2 repeat2D( vec2 coord, vec2 spacing ) {
+	vec2 p;
+	p = mod(coord.y, spacing.y) - spacing.x * 0.5;
+	return p;
+}*/
+
 vec2 repeatAng(vec2 p, float n) {
     float ang = 2.0*3.14/n;
     float sector = floor(atan(p.x, p.y)/ang + 0.5);
@@ -74,9 +84,20 @@ float setola( vec3 pos, float r, float h ) {
 }
 
 float pennello( vec3 pos ) {
-	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*sin(time * 0.001));
+	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
 	pos.xz = repeatAng( pos.xz, 13 );
-	pos.yz = rotate( pos.yz, -0.7 );
+	pos.yz = rotate( pos.yz, 0.1 );
+	pos.y -= 0.6 * abs(pos.z);
+	pos.z = max( pos.z, -2.0 );
+	pos.z = min( pos.z, 2.0 );
+	pos.z = repeatAli( pos.z, 0.2 );
+	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
+}
+
+float singoloPennello( vec3 pos ) {
+	//pos.xz = rotate(pos.xz, -length(pos.xy) * 0.5);
+	pos.xz = repeatAng( pos.xz, 13 );
+	pos.yz = rotate( pos.yz, 0.1 );
 	pos.y -= 0.6 * abs(pos.z);
 	pos.z = max( pos.z, -2.0 );
 	pos.z = min( pos.z, 2.0 );
@@ -86,12 +107,23 @@ float pennello( vec3 pos ) {
 
 
 float distFunct( vec3 pos ) {
-	//pos.x = pow( pos.x, 0.2 ) - pow( pos.y, 0.3 );
+	//// Singolo cilindro
 	//pos.x = repeat( pos.x, 1.0 );
 	//pos.z = repeat( pos.z, 0.5 );
 	//float set = setola( pos, 0.2, 2.0 );
 	//return set;
 	//return set + cisti( pos, time, 20.0, 0.04 );
+	
+	//// Singolo pennello
+	//float penn = singoloPennello( pos );
+	//return penn;
+	
+	//// Cometa
+	pos.y = max( pos.y, -2.5 );
+	pos.y = min( pos.y, 1.0 );
+	pos.xz = rotate( pos.xz, 0.005 * time );
+	pos.y = repeat(pos.y, 2.5 );
+	pos.z += 1.0;
 	float penn = pennello( pos );
 	return penn;
 }
@@ -106,13 +138,13 @@ void main() {
 	float t = time * 0.2;
 	
 	vec3 cameraTar = vec3(0.0);
-	vec3 cameraOrigin = vec3(4.0) * cameraTrg;
+	vec3 cameraOrigin = vec3(6.0) * cameraTrg;
 	
 	vec3 cameraDir	= normalize( cameraTar - cameraOrigin );
 	//vec3 cameraDir    = normalize( cameraTrg - cameraOrg );
 	vec3 cameraRight  = normalize( cross( cameraDir, -cameraUpd ) );
 	vec3 cameraUp     = normalize( cross( cameraRight, -cameraDir ) );
-	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + zoom*cameraDir);
+	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
 	float totalDist = 0.0;
 	//vec3 pos = cameraOrg;
@@ -124,11 +156,11 @@ void main() {
 		if (dist < EPSILON|| totalDist > MAX_DIST)
         	break;
 		dist = distFunct(pos);
-		totalDist += dist;
+		totalDist += dist * 0.1;
 		pos += dist * rayDir;
 	}
 	
-	color = vec4( vec3(1.0/totalDist), 1.0 );
+	color = vec4( vec3(0.75/totalDist), 1.0 );
 	
 	
 	vec2 eps = vec2(0.0, EPSILON);
@@ -136,11 +168,12 @@ void main() {
 		distFunct(pos + eps.yxx) - distFunct(pos - eps.yxx),
 		distFunct(pos + eps.xyx) - distFunct(pos - eps.xyx),
 		distFunct(pos + eps.xxy) - distFunct(pos - eps.xxy)));
-	float diffuse = max(0.0, dot(-rayDir, normal));
-	float specular = pow( diffuse, 8.0 );
+	float diffuse = max(0.35, dot(-rayDir, normal));
+	float specular = pow( diffuse, 4.25 );
 	
 	float lenPos = length(pos);
 	
-	color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
+	color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
+	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
 	
 }
