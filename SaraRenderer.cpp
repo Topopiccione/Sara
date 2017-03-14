@@ -63,7 +63,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	glBindVertexArray( 0 );
 
 	glBindProgramPipeline( 0 );
-
+	
 	if (postProcess) {
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		fboDraw();
@@ -104,8 +104,7 @@ void SaraRenderer::procTexDraw() {
 
 	glBindProgramPipeline( procTexShd->getPipeline() );
 
-	//mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
-	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
+	procTexShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
 
 	glBindVertexArray( vao );
 	glDrawArrays( GL_QUADS, 0, 4 );

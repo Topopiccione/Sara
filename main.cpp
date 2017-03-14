@@ -52,7 +52,7 @@ int main( void ) {
 		SHDPATH + std::string( "shaders\\quadretti.frag" ),
 		SHDPATH + std::string( "shaders\\test3.frag" ),
 		SHDPATH + std::string( "shaders\\piloni.frag" ),
-		SHDPATH + std::string( "shaders\\procTexture_voronoi.frag") };
+		SHDPATH + std::string( "shaders\\procTexture_grad2D.frag") };
 		//SHDPATH + std::string( "shaders\\superstructure.frag" )
 
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );
@@ -80,6 +80,7 @@ int main( void ) {
 		if (SaraGlobal::recompileShader) {
 			mainShader.compileShaders();
 			postProcShader.compileShaders();
+			procTexShader.compileShaders();
 			SaraGlobal::recompileShader = false;
 		}
 
