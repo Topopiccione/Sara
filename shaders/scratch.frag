@@ -107,20 +107,28 @@ float singoloPennello( vec3 pos ) {
 
 
 float distFunct( vec3 pos ) {
-	//// Singolo cilindro
-	//pos.x = repeat( pos.x, 1.0 );
-	//pos.z = repeat( pos.z, 0.5 );
-	//float set = setola( pos, 0.2, 2.0 );
-	//return set;
-	//return set + cisti( pos, time, 20.0, 0.04 );
+	////// Singolo cilindro
+	// pos.x = repeat( pos.x, 1.0 );
+	// pos.z = repeat( pos.z, 0.5 );
+	// float set = setola( pos, 0.2, 2.0 );
+	// return set;
+	// return set + cisti( pos, time, 20.0, 0.04 );
 	
-	//// Singolo pennello
-	//float penn = singoloPennello( pos );
-	//return penn;
+	////// Singolo pennello
+	// float penn = singoloPennello( pos );
+	// return penn;
 	
-	//// Cometa
+	////// Cometa
+	// pos.y = max( pos.y, -2.5 );
+	// pos.y = min( pos.y, 1.0 );
+	// pos.xz = rotate( pos.xz, 0.005 * time );
+	// pos.y = repeat(pos.y, 2.5 );
+	// pos.z += 1.0;
+	// float penn = pennello( pos );
+	// return penn;
+	
+	////// Fila indiana
 	pos.y = max( pos.y, -2.5 );
-	pos.y = min( pos.y, 1.0 );
 	pos.xz = rotate( pos.xz, 0.005 * time );
 	pos.y = repeat(pos.y, 2.5 );
 	pos.z += 1.0;
