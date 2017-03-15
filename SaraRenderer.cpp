@@ -75,6 +75,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	if (SaraGlobal::windowResize) {
 		twb.resize();
 		setupFBO( &frameBufferObj, &frameBufferObjTex );
+		//setupFBO( &procTextureObj, &procTextureObjTex );
 		SaraGlobal::windowResize = false;
 	}
 	twb.draw();

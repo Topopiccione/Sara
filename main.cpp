@@ -54,14 +54,17 @@ int main( void ) {
 		SHDPATH + std::string( "shaders\\piloni.frag" ),
 		SHDPATH + std::string( "shaders\\hills.frag" ), 
 		SHDPATH + std::string( "shaders\\greymandelbulb.frag" ),
-		SHDPATH + std::string( "shaders\\scratch.frag" ) };
+		SHDPATH + std::string( "shaders\\scratch.frag" ),
+		SHDPATH + std::string( "shaders\\modExp2.frag" ) };
 		//SHDPATH + std::string( "shaders\\superstructure.frag" )
 
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );
+	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), shaderNames );
 
 	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
 
 	SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_voronoi.frag" ) );
+	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_grad2D.frag" ) );
 
 	SaraCamera mainCamera;
 
@@ -95,8 +98,6 @@ int main( void ) {
 		
 		glfwPollEvents();
 		glfwSwapBuffers( wndMgr.getWndw() );
-
-
 	}
 	
 	// close GL context and any other GLFW resources

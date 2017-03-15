@@ -174,7 +174,6 @@ void main() {
 	
 	color = vec4( vec3(0.75/totalDist), 1.0 );
 	
-	
 	vec2 eps = vec2(0.0, EPSILON);
 	vec3 normal = normalize(vec3(
 		distFunct(pos + eps.yxx) - distFunct(pos - eps.yxx),
@@ -187,7 +186,8 @@ void main() {
 	
 	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
 	vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
-    vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
+    //vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
+	vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
 	color = vec4( colour, 1.0 );
 	
 	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
