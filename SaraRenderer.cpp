@@ -13,8 +13,9 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 	std::cout << "Renderer: " << renderer << std::endl;
 	std::cout << "OpenGL version supported: " << version << std::endl;
 
-	setupFBO( &frameBufferObj, &frameBufferObjTex );
-	setupFBO( &procTextureObj, &procTextureObjTex );
+	setupFBO( &frameBufferObj, &frameBufferObjTex, SaraGlobal::xRes, SaraGlobal::yRes );
+	//setupFBO( &procTextureObj, &procTextureObjTex, SaraGlobal::xRes, SaraGlobal::yRes );
+	setupFBO( &procTextureObj, &procTextureObjTex, texXsize, texYsize );
 	setupVBO();
 
 	glEnable( GL_TEXTURE_2D );
@@ -27,10 +28,6 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LESS );
-
-	/*glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE );
-	glTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
-	glTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );*/
 		
 	start = std::clock();
 	
@@ -78,7 +75,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 
 	if (SaraGlobal::windowResize) {
 		twb.resize();
-		setupFBO( &frameBufferObj, &frameBufferObjTex );
+		setupFBO( &frameBufferObj, &frameBufferObjTex, SaraGlobal::xRes, SaraGlobal::yRes );
 		//setupFBO( &procTextureObj, &procTextureObjTex );
 		SaraGlobal::windowResize = false;
 	}
@@ -112,7 +109,7 @@ void SaraRenderer::procTexDraw() {
 
 	glBindProgramPipeline( procTexShd->getPipeline() );
 
-	procTexShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
+	procTexShd->setUniforms( texXsize, texYsize, t, came->origin, came->target, came->upDrct );
 
 	glBindVertexArray( vao );
 	glDrawArrays( GL_QUADS, 0, 4 );
@@ -126,7 +123,7 @@ void SaraRenderer::procTexDraw() {
 
 
 
-void SaraRenderer::setupFBO( GLuint * obj, GLuint * objTex ) {
+void SaraRenderer::setupFBO( GLuint * obj, GLuint * objTex, int xSize, int ySize ) {
 	// genero texture da collegare al FBO
 	glGenTextures( 1, objTex );
 	glBindTexture( GL_TEXTURE_2D, *objTex );
@@ -142,7 +139,7 @@ void SaraRenderer::setupFBO( GLuint * obj, GLuint * objTex ) {
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
 	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE ); // automatic mipmap generation included in OpenGL v1.4 (ma non funzionano lo stesso)
-	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, SaraGlobal::xRes, SaraGlobal::yRes, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
+	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, xSize, ySize, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
 	// creazione FBO

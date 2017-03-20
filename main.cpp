@@ -65,6 +65,9 @@ int main( void ) {
 
 	SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_voronoi.frag" ) );
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_grad2D.frag" ) );
+	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_rembrant.frag" ) );
+	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_twister3.frag" ) );
+
 
 	SaraCamera mainCamera;
 
@@ -91,7 +94,20 @@ int main( void ) {
 
 		mainRenderer.update();
 		if (drawProcTex) {
+			glViewport( 0, 0, mainRenderer.texXsize, mainRenderer.texYsize );
+			glMatrixMode( GL_PROJECTION );
+			glLoadIdentity();
+			glMatrixMode( GL_MODELVIEW );
+			glLoadIdentity();
+
 			mainRenderer.procTexDraw();
+
+			glViewport( 0, 0, SaraGlobal::xRes, SaraGlobal::yRes );
+			glMatrixMode( GL_PROJECTION );
+			glLoadIdentity();
+			glMatrixMode( GL_MODELVIEW );
+			glLoadIdentity();
+
 			drawProcTex = false;
 		}
 		mainRenderer.mainDraw( SaraGlobal::postProcess );

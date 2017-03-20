@@ -21,8 +21,11 @@ public:
 	void update( float newTime );
 	void update( void );
 
+	const int				texXsize = 1200;
+	const int				texYsize = 1200;
+
 private:
-	void setupFBO( GLuint * obj, GLuint * objTex );
+	void setupFBO( GLuint * obj, GLuint * objTex, int xSize, int ySize );
 	void setupVBO( void );
 
 	std::clock_t start;
