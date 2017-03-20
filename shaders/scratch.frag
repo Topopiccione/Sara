@@ -9,6 +9,7 @@ uniform float time;
 uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
+uniform sampler2D tex;
 
 const int MAX_ITER = 50;
 const float MAX_DIST = 35.0;
@@ -50,13 +51,6 @@ float repeat(float coord, float spacing) {
 float repeatAli(float coord, float spacing) {
     return mod(coord + 0.1, spacing) - spacing*0.5;
 }
-/*
-vec2 repeat2D( vec2 coord, vec2 spacing ) {
-	vec2 p;
-	p = mod(coord.y, spacing.y) - spacing.x * 0.5;
-	return p;
-}*/
-
 vec2 repeatAng(vec2 p, float n) {
     float ang = 2.0*3.14/n;
     float sector = floor(atan(p.x, p.y)/ang + 0.5);
@@ -104,6 +98,32 @@ float singoloPennello( vec3 pos ) {
 	pos.z = repeat( pos.z, 0.2 );
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
+
+/////// Calcolo del colore: lettura da texture
+vec4 texcube( sampler2D sam, in vec3 p, in vec3 n ) {
+	vec4 x = texture( sam, p.yz );
+	vec4 y = texture( sam, p.zx );
+	vec4 z = texture( sam, p.yx );
+    vec3 a = abs(n);
+	return (x*a.x + y*a.y + z*a.z) / (a.x + a.y + a.z);
+}
+
+vec3 cubemap( sampler2D sam, in vec3 d ) {
+    vec3 n = abs(d);
+#if 0
+    // sort components (small to big)    
+    float mi = min(min(n.x,n.y),n.z);
+    float ma = max(max(n.x,n.y),n.z);
+    vec3 o = vec3( mi, n.x+n.y+n.z-mi-ma, ma );
+    return texture2D( sam, abs(.09*o.xy/o.z) ).xyz;
+#else
+   vec2 uuv = (n.x>n.y && n.x>n.z) ? d.yz/d.x: 
+              (n.y>n.x && n.y>n.z) ? d.zx/d.y:
+                                     d.xy/d.z;
+    return texture( sam, uuv ).xyz;
+#endif    
+}
+
 
 
 float distFunct( vec3 pos ) {
@@ -170,7 +190,6 @@ void main() {
 	
 	color = vec4( vec3(0.75/totalDist), 1.0 );
 	
-	
 	vec2 eps = vec2(0.0, EPSILON);
 	vec3 normal = normalize(vec3(
 		distFunct(pos + eps.yxx) - distFunct(pos - eps.yxx),
@@ -181,7 +200,19 @@ void main() {
 	
 	float lenPos = length(pos);
 	
-	color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
+	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
+	//vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
+    //vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
+	//vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
+	//color = vec4( colour, 1.0 );
+	
+	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 ) * textureProj( tex, normal );
+	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
+	
+	vec3 ff = cubemap( tex, pos );
+	color = vec4( vec3((diffuse + specular)/lenPos) * ff, 1.0 );
+	
+	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
 	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
 	
 }

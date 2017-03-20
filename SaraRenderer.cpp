@@ -27,7 +27,11 @@ SaraRenderer::SaraRenderer( SaraWindowManager * windowManager, SaraShaderManager
 
 	glEnable( GL_DEPTH_TEST );
 	glDepthFunc( GL_LESS );
-	
+
+	/*glTexEnvi( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_COMBINE_RGB_ARB, GL_MODULATE );
+	glTexEnvi( GL_TEXTURE_ENV, GL_RGB_SCALE_ARB, 2 );*/
+		
 	start = std::clock();
 	
 }
@@ -55,8 +59,11 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 
 	glBindProgramPipeline( mainShd->getPipeline() );
 
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_2D, procTextureObjTex );
+
 	//mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
-	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct );
+	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct, 0 );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );
@@ -72,6 +79,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	if (SaraGlobal::windowResize) {
 		twb.resize();
 		setupFBO( &frameBufferObj, &frameBufferObjTex );
+		//setupFBO( &procTextureObj, &procTextureObjTex );
 		SaraGlobal::windowResize = false;
 	}
 	twb.draw();
@@ -123,13 +131,17 @@ void SaraRenderer::setupFBO( GLuint * obj, GLuint * objTex ) {
 	glGenTextures( 1, objTex );
 	glBindTexture( GL_TEXTURE_2D, *objTex );
 	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+	//  ^^^ Questo sballa quando ridimensiono la finestra perché non vengono generate le mipmap di risoluzione inferiore
+	//      Inoltre si fotte le cubemap!
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE ); // automatic mipmap generation included in OpenGL v1.4
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	//glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+	glTexParameteri( GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE ); // automatic mipmap generation included in OpenGL v1.4 (ma non funzionano lo stesso)
 	glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, SaraGlobal::xRes, SaraGlobal::yRes, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0 );
 	glBindTexture( GL_TEXTURE_2D, 0 );
 
