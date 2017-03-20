@@ -108,6 +108,22 @@ vec4 texcube( sampler2D sam, in vec3 p, in vec3 n ) {
 	return (x*a.x + y*a.y + z*a.z) / (a.x + a.y + a.z);
 }
 
+vec3 cubemap( sampler2D sam, in vec3 d ) {
+    vec3 n = abs(d);
+#if 0
+    // sort components (small to big)    
+    float mi = min(min(n.x,n.y),n.z);
+    float ma = max(max(n.x,n.y),n.z);
+    vec3 o = vec3( mi, n.x+n.y+n.z-mi-ma, ma );
+    return texture2D( sam, abs(.09*o.xy/o.z) ).xyz;
+#else
+   vec2 uuv = (n.x>n.y && n.x>n.z) ? d.yz/d.x: 
+              (n.y>n.x && n.y>n.z) ? d.zx/d.y:
+                                     d.xy/d.z;
+    return texture( sam, uuv ).xyz;
+#endif    
+}
+
 
 
 float distFunct( vec3 pos ) {
@@ -185,10 +201,16 @@ void main() {
 	float lenPos = length(pos);
 	
 	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
-	vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
+	//vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
     //vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
-	vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
-	color = vec4( colour, 1.0 );
+	//vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
+	//color = vec4( colour, 1.0 );
+	
+	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 ) * textureProj( tex, normal );
+	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
+	
+	vec3 ff = cubemap( tex, pos );
+	color = vec4( vec3((diffuse + specular)/lenPos) * ff, 1.0 );
 	
 	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
 	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
