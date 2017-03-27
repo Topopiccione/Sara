@@ -11,10 +11,10 @@ uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
 uniform sampler2D tex;
 
-const int MAX_ITER = 50;
+const int MAX_ITER = 128;
 const float MAX_DIST = 35.0;
 const float EPSILON  = 0.001;
-const float fieldOfView = 0.5;
+const float fieldOfView = 1.0;
 const float zoom = 0.5;
 
 
@@ -96,6 +96,13 @@ float setola( vec3 pos, float r, float h ) {
 	return min(cyl, punta);
 }
 
+float setola( vec3 pos, float r, float h, out vec3 colore ) {
+	float cyl = cylinder( pos, r, h );
+	float punta = sphere( pos - vec3(0.0,h/2.0,0.0), r );
+	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
+	return min(cyl, punta);
+}
+
 float pennello( vec3 pos ) {
 	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
 	pos.xz = repeatAng( pos.xz, 13 );
@@ -119,41 +126,63 @@ float pennello( in vec3 pos, out vec3 colore ) {
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
 
-float singoloPennello( vec3 pos ) {
-	//pos.xz = rotate(pos.xz, -length(pos.xy) * 0.5); 
+float singoloPennello( vec3 pos, out vec3 colore ) {
+	//pos.xz = rotate(pos.xz, -length(pos.xy) * 0.5);
+	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
 	pos.xz = repeatAng( pos.xz, 13 );
 	pos.yz = rotate( pos.yz, 0.1 );
 	pos.y -= 0.6 * abs(pos.z);
 	pos.z = max( pos.z, -2.0 );
-	pos.z = min( pos.z, 2.0 );
-	pos.z = repeat( pos.z, 0.2 );
+	pos.z = min( pos.z, 2.1 );
+	pos.z = repeat( pos.z, 0.2332 );
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
 
 
+//// Background
+// da hills.frag
+vec3 GetSky(in vec3 rd) {
+	vec3 sunLight  = normalize( vec3( -0.75, 0.2, -0.6 ) );
+	vec3 sunColour = vec3(1.0, .75, .6);
 
+	float sunAmount = max( dot( rd, sunLight), 0.0 );
+	float v = pow(1.0-max(rd.y,0.0),6.);
+	vec3  sky = mix(vec3(.1, .2, .3), vec3(.32, .32, .32), v);
+	sky = sky + sunColour * sunAmount * sunAmount * .25;
+	sky = sky + sunColour * min(pow(sunAmount, 800.0)*1.5, .3);
+	return clamp(sky, 0.0, 1.0);
+}
+
+
+vec2 sim2d(vec2 p,float s){
+   vec2 ret=p;
+   ret=p+s/2.0;
+   ret=fract(ret/s)*s-s/2.0;
+   return ret;
+}
 
 
 float distFunct( in vec3 pos, out vec3 colore ) {
 	////// Singolo cilindro
-	// pos.x = repeat( pos.x, 1.0 );
-	// pos.z = repeat( pos.z, 0.5 );
-	// float set = setola( pos, 0.2, 2.0 );
+	// pos.x = repeat( pos.x, 1.2 );
+	// pos.z = repeat( pos.z, 0.7 );
+	// //float set = setola( pos, 0.2, 2.0 ); // Variante senza texture
+	// float set = setola( pos, 0.2, 2.0, colore );
 	// return set;
 	// return set + cisti( pos, time, 20.0, 0.04 );
 	
 	////// Singolo pennello
-	// float penn = singoloPennello( pos );
+	// float penn = singoloPennello( pos, colore );
 	// return penn;
 	
 	////// Cometa
-	pos.y = max( pos.y, -2.5 );
-	pos.y = min( pos.y, 1.0 );
-	pos.xz = rotate( pos.xz, 0.005 * time );
-	pos.y = repeat(pos.y, 2.5 );
-	pos.z += 1.0;
-	float penn = pennello( pos, colore );
-	return penn;
+	// pos.y = max( pos.y, -2.5 );
+	// pos.y = min( pos.y, 1.0 );
+	// pos.xz = rotate( pos.xz, 0.005 * time );
+	// pos.y = repeat(pos.y, 2.5 );
+	// pos.z += 1.0;
+	// float penn = pennello( pos, colore );
+	// return penn;
 	
 	////// Fila indiana
 	// pos.y = max( pos.y, -2.5 );
@@ -162,6 +191,24 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	// pos.z += 1.0;
 	// float penn = pennello( pos, colore );
 	// return penn;
+	
+	////// Cespugli rotanti
+	// float penn;
+	// // float s = 0.025;
+	// // pos = pos-mod(pos-s/2.0,s);
+	// float d=sin(length(pos/2.0)*1.0-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*0.5+0.5);
+	// pos.xz = sim2d(pos.xz, 2.5 );
+	// pos.xz = rotate( pos.xz, 1.4 * d );
+	// penn = singoloPennello( pos, colore );
+	// return penn;
+	
+	float d=sin(length(pos/2.0)*1.0-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.5+0.5);
+	pos.y = max( pos.y, -2.5 );
+	pos.xz = rotate( pos.xz, 0.5 * d );
+	pos.y = repeat(pos.y, 2.5 );
+	pos.z += 1.0;
+	float penn = pennello( pos, colore );
+	return penn;
 }
 
 
@@ -189,18 +236,28 @@ void main() {
 	
 	vec3 ccc;
 	vec3 dummy;
+	bool rayMiss = false;
 	
 	// Raymarch loop
 	for ( int i = 0; i < MAX_ITER; i++ ) {
-		if (dist < EPSILON|| totalDist > MAX_DIST)
+		if (dist < EPSILON)
         	break;
+		if ( totalDist > MAX_DIST ) {
+			rayMiss = true;
+			break;
+		}
 		dist = distFunct(pos, ccc);
 		totalDist += dist * 0.1;
 		pos += dist * rayDir;
 	}
 	
-	color = vec4( vec3(0.75/totalDist), 1.0 );
-	
+	// bersaglio mancato!
+	if (rayMiss) {
+		//color = vec4( 0.5, 0.2, 0.3, 1.0);
+		color = vec4( GetSky( vec3(-rayDir.y, rayDir.xz )), 1.0 );
+		return;
+	}
+		
 	vec2 eps = vec2(0.0, EPSILON);
 	vec3 normal = normalize(vec3(
 		distFunct(pos + eps.yxx, dummy) - distFunct(pos - eps.yxx, dummy),
@@ -217,10 +274,10 @@ void main() {
 	//vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
 	//color = vec4( colour, 1.0 );
 	
-	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 ) * textureProj( tex, normal );
 	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
 	
 	// vec3 ff = cubemap( tex, pos ) * 3.0;
+	//color = vec4( ccc * 2.0, 1.0 );
 	//color = vec4( vec3((diffuse + specular)/(lenPos * 0.3)) * ccc, 1.0 );
 	color = vec4( (vec3(1.0/totalDist) + vec3((diffuse + specular)/lenPos)) * ccc, 1.0 );
 	
