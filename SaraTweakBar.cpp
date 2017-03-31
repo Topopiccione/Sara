@@ -20,8 +20,9 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 		{ 6, "gray mandelbulb" },
 		{ 7, "scratch" },
 		{ 8, "modExpTexture" },
+		{ 9, "did" },
 	};
-	TwType shadNames = TwDefineEnum( "ShaderNames", shaderNames, 9 );
+	TwType shadNames = TwDefineEnum( "ShaderNames", shaderNames, 10 );
 
 	//TwAddVarRW( bar, "CameraDir", TW_TYPE_DIR3F, &global_cameraDirection,
 	//	" label='Camera direction' opened=true help='Cambia punto di vista' " );
