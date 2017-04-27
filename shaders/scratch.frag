@@ -202,10 +202,13 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	// penn = singoloPennello( pos, colore );
 	// return penn;
 	
-	float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
+	//float d = -0.5 * length(pos / 3.0);  // Questo "arrotola" la fila
+	// float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
+	float fatt = length( pos / 5.0 ) * 1.5;
+	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 0.5;
 	pos.y = max( pos.y, -2.5 );
 	pos.xz = rotate( pos.xz, 0.5 * d );
-	pos.y = repeat(pos.y, 2.5 );
+	pos.y = repeat( pos.y, 2.5 );
 	pos.z += 1.0;
 	float penn = pennello( pos, colore );
 	return penn;
