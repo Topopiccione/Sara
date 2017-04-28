@@ -18,6 +18,7 @@ public:
 	glm::vec3 upDrct;
 
 	void update();
+	void updatePosition();
 
 private:
 	float camPitch;

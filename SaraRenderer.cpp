@@ -43,6 +43,8 @@ void SaraRenderer::update( float newTime ) {
 void SaraRenderer::update() {
 	if (SaraGlobal::cameraMoving)
 		came->update();
+	if (SaraGlobal::cameraBackward || SaraGlobal::cameraForward || SaraGlobal::cameraStrafeLeft || SaraGlobal::cameraStrafeRight)
+		came->updatePosition();
 	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
 	mainShd->checkGlobalShd();
 }
