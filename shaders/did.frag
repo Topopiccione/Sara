@@ -18,6 +18,24 @@ vec2 resolution = vec2( res_x, res_y );
 const float PI = 3.14;
 
 
+#define HARD_SHADOW
+#define GLOW
+#define EDGES
+#define NUM_TENTACLES 6
+#define BUMPS
+#define NUM_BUMPS 8
+#define BACKGROUND
+#define SUN_POS vec3(15.0, 15.0, -15.0)
+#define SPHERE_COL vec3(0.6, 0.3, 0.1)
+#define MOUTH_COL vec3(0.9, 0.6, 0.1)
+#define TENTACLE_COL vec3(0.06)
+float glow, bite;
+vec3 sphere_col;
+vec3 sun = normalize(SUN_POS);
+float focus = 5.0;
+float far = 23.0;
+
+
 float nlength( vec3 v, float n ){
 	return pow(v.x, n) + pow(v.y, n) + pow(v.z, n);
 }
@@ -34,6 +52,16 @@ float sphere( vec3 center, float radius ) {
 float sBox( vec3 p, vec3 b ) {
 	vec3 d = abs(p) - b;
 	return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+float sdSphere(vec3 p, float r)
+{
+	return length(p)-r;
+}
+
+float sdCappedCylinder( vec3 p, vec2 h )
+{
+  vec2 d = abs(vec2(length(p.xy),p.z)) - h;
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
 
 vec2 rotate(vec2 p, float ang) {
@@ -65,14 +93,6 @@ float pModPolar(inout vec2 p, float repetitions) {
 	return c;
 }
 
-vec3 transl( vec3 pos, vec3 tran ) {
-	mat4 mm = mat4(1.0, 0.0, 0.0, tran.x,
-				0.0, 1.0, 0.0, tran.y,
-				0.0, 0.0, 1.0, tran.z,
-				0.0, 0.0, 0.0, 1.0);
-	return (mm * vec4(pos, 1.0)).xyz;
-}
-
 /*
 float distFunct( vec3 pos) {
 	float cubo = sBox( pos, vec3(1.0, 2.0, 0.0) );
@@ -87,19 +107,60 @@ float distFunct( vec3 pos) {
 
 float distFunct( vec3 pos ) {
 
-	float s = 1.0;
-	vec3 fp = pos - mod(pos - s * 0.5, s);
-	//pos += vec3(1.16, 0.2, 0.0);
-	//float c = pModPolar(pos.yz, 4);
-	//pos = transl(pos, vec3(1.0, 0.5, 0.2));
-	//pos = min(pos, -vec3(1.0, 0.15, 0.15) );
-	pos.xyz = mod(pos.xyz, 1.25) - 1.25 * 0.5;
-	//pos.y = mod(pos.y, 1.25) - 1.25 * .5;
-	//pos = repeatAngS(pos.xz - vec2(0.5,1.0), 15);
+	//float c = pModPolar(pos.yz, 5);
 	
+	//pos = min(pos, -vec3(1.0, 0.15, 0.15) );
+	//pos.xyz = mod(pos.xyz, 1.25) - 1.25 * 0.5;
+	pos.y = mod(pos.y, 1.25) - 1.25 * .5;
+	pos = repeatAngS(pos.yz, 5);
+	//pos *= vec3( 1.5, 1.0, 0.0 );
 	float cubo = sBox( pos, vec3(0.15) );
 	
 	return cubo;
+}
+
+
+float scene(vec3 p)
+{
+	float d, d1, d2, d3, f, e = 0.15;
+	float tt = time * 0.01;
+	
+	vec3 q = p;
+	q.xy = rotate(q.xy, 1.5);
+	
+	// center sphere
+	d1 = sdSphere(q, 0.3);
+	d = d1; 
+    vec3 col = sphere_col; 
+    
+	// tentacles
+	float r = length(q);
+	float a = atan(q.z, q.x);
+	a += 0.4*sin(r-tt);
+	
+	q = vec3(a*float(NUM_TENTACLES)/(PI*2.0),q.y,length(q.xz)); // circular domain
+	q = vec3(mod(q.x,1.0)-0.5*1.0,q.y,q.z); // repetition
+	
+	d3 = sdCappedCylinder(q-vec3(0.0,0.0,0.9+bite), vec2(0.1-(r-bite)/18.0,0.8));
+	d2 = min(d3, sBox(q-vec3(0.0, 0.0, 0.1+bite), vec3(0.2, 0.2, 0.2))); // close box
+	d2 = smin(d2, sBox(q-vec3(0.0, 0.0, 0.4+bite), vec3(0.2, 0.05, 0.4)), 0.1); // wide box
+	
+    f = smoothstep(0.11, 0.28, d2-d1);
+	col = mix(MOUTH_COL, col, f);
+	e = mix(e, 0.0, f);
+	d = smin(d1, d2, 0.24);
+    
+	col = mix(TENTACLE_COL, col, smoothstep(0., 0.48, d3-d));
+	
+	#ifdef BACKGROUND
+	q = p;
+	q.yz = mod(q.yz, 1.0);
+	q -= vec3(-.6, 0.5, 0.5);
+	d1 = sBox(q, vec3(0.1, 0.48, 0.48));
+	if (d1 < d) { d = d1; col = vec3(0.1); }
+	#endif
+	
+	return d;
 }
 
 
@@ -128,7 +189,8 @@ void main()
 	for ( int i = 0; i < MAX_ITER; i++ ) {
 		if (dist < EPSILON|| totalDist > MAX_DIST)
         		break;
-		dist = distFunct(pos);
+		//dist = distFunct(pos);
+		dist = scene( pos );
 		totalDist += dist;
 		pos += dist * rayDir;
 	}

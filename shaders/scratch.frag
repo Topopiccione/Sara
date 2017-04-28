@@ -204,16 +204,17 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	
 	//float d = -0.5 * length(pos / 3.0);  // Questo "arrotola" la fila
 	// float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
+	vec3 q = pos;	
 	float fatt = length( pos / 5.0 ) * 1.5;
-	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 0.5;
-	pos.y = max( pos.y, -2.5 );
-	pos.xz = rotate( pos.xz, 0.5 * d );
-	  // float ff = sin( fatt ) + ( sin( fatt * 2.0) * 1.5 + 0.5 );
-	  // pos.xz += vec2(ff);
-	pos.y = repeat( pos.y, 2.5 );
-	
-	pos.z += 1.0;
-	float penn = pennello( pos, colore );
+	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 0.5;	
+	q.xz = rotate(q.xz, 0.01 * length(q.xz) + sin(time * 0.002) * 1.5);
+	q.xy = rotate(q.xy, 0.005 * length(q.xy) - sin(time * 0.001) * 3.0);
+	q.y = max( q.y, -0.0 );
+	q.y = min( q.y, 150.0 );
+	q.xz = rotate( q.xz, 0.5 * d );
+	q.y = repeat( q.y, 2.5 );
+	float penn = pennello( q, colore );
+	float bb = sBox( q, vec3(1.0) );
 	return penn;
 }
 
@@ -236,7 +237,7 @@ void main() {
 	vec3 cameraTarget = cameraTrg;
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
 	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
-	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
+	vec3 cameraUp     = -normalize( cross( -cameraRight, cameraDir ) );
 	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
 	float totalDist = 0.0;
