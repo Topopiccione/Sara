@@ -16,5 +16,9 @@ namespace SaraGlobal {
 	extern bool		postProcess;
 	extern bool		cameraMoving;
 	extern bool		cameraStartMoving;
+	extern bool		cameraForward;
+	extern bool		cameraBackward;
+	extern bool		cameraStrafeLeft;
+	extern bool		cameraStrafeRight;
 
 };

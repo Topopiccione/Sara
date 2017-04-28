@@ -12,6 +12,43 @@ void key_callback( GLFWwindow* window, int key, int scancode, int action, int mo
 			SaraGlobal::recompileShader = true;
 		if (key == GLFW_KEY_P && action == GLFW_PRESS)
 			SaraGlobal::postProcess = !SaraGlobal::postProcess;
+		if (key == GLFW_KEY_W && action == GLFW_PRESS) {
+			SaraGlobal::cameraForward = true;
+			SaraGlobal::cameraMoving = true;
+		}
+		if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+			SaraGlobal::cameraForward = false;
+			SaraGlobal::cameraMoving = false;
+			SaraGlobal::cameraStartMoving = true;
+		}
+		if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+			SaraGlobal::cameraBackward = true;
+			SaraGlobal::cameraMoving = true;
+		}
+		if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
+			SaraGlobal::cameraBackward = false;
+			SaraGlobal::cameraMoving = false;
+			SaraGlobal::cameraStartMoving = true;
+		}
+		if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+			SaraGlobal::cameraStrafeLeft = true;
+			SaraGlobal::cameraMoving = true;
+		}
+		if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+			SaraGlobal::cameraStrafeLeft = false;
+			SaraGlobal::cameraMoving = false;
+			SaraGlobal::cameraStartMoving = true;
+		}
+		if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+			SaraGlobal::cameraStrafeRight = true;
+			SaraGlobal::cameraMoving = true;
+		}
+		if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+			SaraGlobal::cameraStrafeRight = false;
+			SaraGlobal::cameraMoving = false;
+			SaraGlobal::cameraStartMoving = true;
+		}
+
 	}
 }
 
