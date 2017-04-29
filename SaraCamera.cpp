@@ -47,7 +47,6 @@ void SaraCamera::update() {
 
 	target = glm::rotate( rotQuat,cameraDir ) + origin;
 	upDrct = glm::rotate( rotQuat, upDrct );
-	//origin = glm::rotate( rotQuat, origin );
 
 	/*origin = rotQuat * origin;// *glm::conjugate( rotQuat );
 	target = rotQuat * target;// *glm::conjugate( rotQuat );

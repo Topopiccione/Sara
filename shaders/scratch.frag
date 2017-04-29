@@ -236,10 +236,8 @@ void main() {
 	vec3 cameraOrigin = cameraOrg;
 	vec3 cameraTarget = cameraTrg;
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
-	//vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
-	//vec3 cameraUp     = -normalize( cross( -cameraRight, cameraDir ) );
-		vec3 cameraRight = normalize( cross( spaceUpDir, cameraOrigin) );
-		vec3 cameraUp = cross( cameraDir, cameraRight );
+	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
+	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
 	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
 	float totalDist = 0.0;
