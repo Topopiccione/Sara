@@ -219,19 +219,12 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 }
 
 
-
-
 void main() {
 	
 	vec2 resolution = vec2( res_x, res_y );
 	vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
 	float t = time * 0.2;
 	
-	/*vec3 cameraTarget = vec3(0.0);
-	vec3 cameraOrigin = vec3(6.0) * cameraTrg;*/
-	// vec3 cameraDir	= normalize( cameraTarget - cameraOrigin );
-	// vec3 cameraRight  = normalize( cross( cameraDir, -cameraUpd ) );
-	// vec3 cameraUp     = normalize( cross( cameraRight, -cameraDir ) );
 	vec3 spaceUpDir   = cameraUpd;
 	vec3 cameraOrigin = cameraOrg;
 	vec3 cameraTarget = cameraTrg;
@@ -241,7 +234,6 @@ void main() {
 	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
 	float totalDist = 0.0;
-	//vec3 pos = cameraOrg;
 	vec3 pos = cameraOrigin;
 	float dist = EPSILON;
 	

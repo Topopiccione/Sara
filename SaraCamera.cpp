@@ -1,5 +1,4 @@
 #include "SaraCamera.h"
-#include <glm\gtx\extend.hpp>
 
 SaraCamera::SaraCamera() {
 	origin = { 1.0f, 0.0f, 0.0f };
@@ -45,12 +44,10 @@ void SaraCamera::update() {
 	glm::quat headnQuat = glm::angleAxis( camHeadn, upDrct );
 	glm::quat rotQuat   = glm::normalize( glm::cross( pitchQuat, headnQuat ) );
 
-	target = glm::rotate( rotQuat,cameraDir ) + origin;
-	upDrct = glm::rotate( rotQuat, upDrct );
-
-	/*origin = rotQuat * origin;// *glm::conjugate( rotQuat );
-	target = rotQuat * target;// *glm::conjugate( rotQuat );
-	upDrct = rotQuat * upDrct;// *glm::conjugate( rotQuat );*/
+	target = rotQuat * cameraDir *glm::conjugate( rotQuat ) + origin;
+	upDrct = rotQuat * upDrct * glm::conjugate( rotQuat );
+	//target = glm::rotate( rotQuat, cameraDir ) + origin;
+	//upDrct = glm::rotate( rotQuat, upDrct );
 
 	SaraGlobal::angle[0] = 0.0f;
 	SaraGlobal::angle[1] = 0.0f;

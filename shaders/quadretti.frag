@@ -19,12 +19,21 @@ void main( void ) {
 	//vec3 pos = vec3(0,0,-16) * rotationXY( angle );
 	//vec3 dir = normalize(vec3((gl_FragCoord.xy - resolution.xy*.5) / resolution.xy, 1.) * rotationXY( angle ));
 	
-	vec3 pos = vec3(12.) * cameraTrg;
+	/*vec3 pos = vec3(12.) * cameraTrg;
 	vec3 ww = normalize( cameraOrg - pos );
 	vec3 uu = normalize( cross(ww,cameraUpd) );
     vec3 vv = normalize( cross(uu,ww) );
 	vec2 pp = (gl_FragCoord.xy - resolution.xy*.5) / resolution.xy;
-	vec3 dir = normalize( pp.x*uu + pp.y*vv + ww );
+	vec3 dir = normalize( pp.x*uu + pp.y*vv + ww );*/
+	vec2 pp = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
+	vec3 spaceUpDir   = cameraUpd;
+	vec3 cameraOrigin = cameraOrg;
+	vec3 cameraTarget = cameraTrg;
+	vec3 ww    = normalize( cameraTarget - cameraOrigin );
+	vec3 uu  = normalize( cross( ww, spaceUpDir ) );
+	vec3 vv     = normalize( cross( uu, ww ) );
+	vec3 dir       = normalize( (uu * pp.x + vv * pp.y) + ww);
+	vec3 pos = cameraOrigin;
 	
 	vec3 colour = vec3(.05,.1,.15);
 	for (float y = 5.; y >= -5.; y--) {

@@ -14,7 +14,7 @@ uniform vec3 cameraUpd;
 // License Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License.
 // Created by S. Guillitte 2015
 
-float zoom=0.25;
+float zoom=1.25;
 
 vec2 cmul( vec2 a, vec2 b )  { return vec2( a.x*b.x - a.y*b.y, a.x*b.y + a.y*b.x ); }
 vec2 csqr( vec2 a )  { return vec2( a.x*a.x - a.y*a.y, 2.*a.x*a.y  ); }
