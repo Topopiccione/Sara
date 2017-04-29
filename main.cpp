@@ -31,7 +31,6 @@ double	SaraGlobal::startY = 0.0;
 int		SaraGlobal::shaderNumber = 0;
 float	SaraGlobal::postProcVar = 0.75;
 
-
 int main( void ) {
 
 	glfwSetErrorCallback( error_callback );
@@ -72,7 +71,6 @@ int main( void ) {
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_grad2D.frag" ) );
 	SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_rembrant.frag" ) );
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_twister3.frag" ) );
-
 
 	SaraCamera mainCamera;
 

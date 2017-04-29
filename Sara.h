@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <glm/vec3.hpp>
 
 namespace SaraGlobal {
 
