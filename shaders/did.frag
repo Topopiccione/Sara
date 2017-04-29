@@ -9,66 +9,64 @@ uniform float time;
 uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
-uniform sampler2D tex;
 
-const int MAX_ITER = 128;
-const float MAX_DIST = 35.0;
+const int MAX_ITER = 100;
+const float MAX_DIST = 25.0;
 const float EPSILON  = 0.001;
-const float fieldOfView = 0.5;
-const float zoom = 0.5;
+const float fieldOfView = 1.0;
+vec2 resolution = vec2( res_x, res_y );
+const float PI = 3.14;
 
 
-vec3 cubemap( sampler2D sam, in vec3 d ) {
-    vec3 n = abs(d);
-//#if 0
-    // sort components (small to big)    
-    float mi = min(min(n.x,n.y),n.z);
-    float ma = max(max(n.x,n.y),n.z);
-    vec3 o = vec3( mi, n.x+n.y+n.z-mi-ma, ma );
-    return texture2D( sam, abs(0.8*o.xy/o.z) ).xyz;
-//#else
-   vec2 uuv = (n.x>n.y && n.x>n.z) ? d.yz/d.x: 
-              (n.y>n.x && n.y>n.z) ? d.zx/d.y:
-                                     d.xy/d.z;
-    return texture( sam, uuv ).xyz;
-//#endif    
-}
+#define HARD_SHADOW
+#define GLOW
+#define EDGES
+#define NUM_TENTACLES 6
+#define BUMPS
+#define NUM_BUMPS 8
+#define BACKGROUND
+#define SUN_POS vec3(15.0, 15.0, -15.0)
+#define SPHERE_COL vec3(0.6, 0.3, 0.1)
+#define MOUTH_COL vec3(0.9, 0.6, 0.1)
+#define TENTACLE_COL vec3(0.06)
+float glow, bite;
+vec3 sphere_col;
+vec3 sun = normalize(SUN_POS);
+float focus = 5.0;
+float far = 23.0;
 
 
+float nlength( vec3 v, float n ){
+	return pow(v.x, n) + pow(v.y, n) + pow(v.z, n);
+}
 
-/// Primitive
-float intersect(float d1, float d2) {
-    return max(d2, d1);
+float smin( float a, float b, float k ) {
+    float h = clamp( 0.5+0.5*(b-a)/k, 0.0, 1.0 );
+    return mix( b, a, h ) - k*h*(1.0-h);
 }
-float plane(vec3 p, vec3 n, float offs) {
-	return dot(p, n) - offs;
+
+float sphere( vec3 center, float radius ) {
+	return length( center ) - radius;
 }
-float sphere(vec3 p, float r) {
-	return length(p) - r;
-}
-float cylinder(in vec3 p, float r) {
-    return length(p.xz) - r;
-}
-float cylinder(in vec3 p, float r, float h) {
-    float d = cylinder(p, r);
-    return max(d, abs(p.y) - h*0.5);
-}
+
 float sBox( vec3 p, vec3 b ) {
 	vec3 d = abs(p) - b;
 	return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
 }
+float sdSphere(vec3 p, float r)
+{
+	return length(p)-r;
+}
 
+float sdCappedCylinder( vec3 p, vec2 h )
+{
+  vec2 d = abs(vec2(length(p.xy),p.z)) - h;
+  return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
 
-//// Rotazioni e modifiche
 vec2 rotate(vec2 p, float ang) {
     float c = cos(ang), s = sin(ang);
     return vec2(p.x*c - p.y*s, p.x*s + p.y*c);
-}
-float repeat(float coord, float spacing) {
-    return mod(coord, spacing) - spacing*0.5;
-}
-float repeatAli(float coord, float spacing) {
-    return mod(coord + 0.1, spacing) - spacing*0.5;
 }
 vec2 repeatAng(vec2 p, float n) {
     float ang = 2.0*3.14/n;
@@ -82,206 +80,143 @@ vec3 repeatAngS(vec2 p, float n) {
     p = rotate(p, sector*ang);
     return vec3(p.x, p.y, mod(sector, n));
 }
-
-//// Distorsioni
-float cisti( vec3 pos, float time, float numeroCisti, float larghezzaCisti ) {
-	return sin(pos.y * numeroCisti + time* 0.002) * larghezzaCisti;
+float pModPolar(inout vec2 p, float repetitions) {
+	float angle = 2*PI/repetitions;
+	float a = atan(p.y, p.x) + angle/2.;
+	float r = length(p);
+	float c = floor(a/angle);
+	a = mod(a,angle) - angle/2.;
+	p = vec2(cos(a), sin(a))*r;
+	// For an odd number of repetitions, fix cell index of the cell in -x direction
+	// (cell index would be e.g. -5 and 5 in the two halves of the cell):
+	if (abs(c) >= (repetitions/2)) c = abs(c);
+	return c;
 }
 
-
-//// Forme composte
-float setola( vec3 pos, float r, float h ) {
-	float cyl = cylinder( pos, r, h );
-	float punta = sphere( pos - vec3(0.0,h/2.0,0.0), r );
-	return min(cyl, punta);
-}
-
-float setola( vec3 pos, float r, float h, out vec3 colore ) {
-	float cyl = cylinder( pos, r, h );
-	float punta = sphere( pos - vec3(0.0,h/2.0,0.0), r );
-	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
-	return min(cyl, punta);
-}
-
-float pennello( vec3 pos ) {
-	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
-	pos.xz = repeatAng( pos.xz, 13 );
-	pos.yz = rotate( pos.yz, 0.1 );
-	pos.y -= 0.6 * abs(pos.z);
-	pos.z = max( pos.z, -2.0 );
-	pos.z = min( pos.z, 2.0 );
-	pos.z = repeatAli( pos.z, 0.2 );
-	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
-}
-
-float pennello( in vec3 pos, out vec3 colore ) {
-	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
-	pos.xz = repeatAng( pos.xz, 13 );
-	pos.yz = rotate( pos.yz, 0.1 );
-	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
-	pos.y -= 0.6 * abs(pos.z);
-	pos.z = max( pos.z, -2.0 );
-	pos.z = min( pos.z, 2.0 );
-	pos.z = repeatAli( pos.z, 0.2 );
-	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
-}
-
-float singoloPennello( vec3 pos, out vec3 colore ) {
-	//pos.xz = rotate(pos.xz, -length(pos.xy) * 0.5);
-	//pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
-	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
-	pos.xz = repeatAng( pos.xz, 13 );
-	pos.yz = rotate( pos.yz, 0.1 );
-	pos.y -= 0.7 * abs(pos.z);
-	pos.z = max( pos.z, -2.0 );
-	pos.z = min( pos.z, 2.0 );
-	pos.z = repeat( pos.z, 0.2 );
-	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
-}
-
-
-//// Background
-// da hills.frag
-vec3 GetSky(in vec3 rd) {
-	vec3 sunLight  = normalize( vec3( -0.75, 0.2, -0.6 ) );
-	vec3 sunColour = vec3(1.0, .75, .6);
-
-	float sunAmount = max( dot( rd, sunLight), 0.0 );
-	float v = pow(1.0-max(rd.y,0.0),6.);
-	vec3  sky = mix(vec3(.1, .2, .3), vec3(.32, .32, .32), v);
-	sky = sky + sunColour * sunAmount * sunAmount * .25;
-	sky = sky + sunColour * min(pow(sunAmount, 800.0)*1.5, .3);
-	return clamp(sky, 0.0, 1.0);
-}
-
-
-vec2 sim2d(vec2 p,float s){
-   vec2 ret=p;
-   ret=p+s/2.0;
-   ret=fract(ret/s)*s-s/2.0;
-   return ret;
-}
-
-
-float distFunct( in vec3 pos, out vec3 colore ) {
-	////// Singolo cilindro
-	// pos.x = repeat( pos.x, 1.2 );
-	// pos.z = repeat( pos.z, 0.7 );
-	// float set = setola( pos, 0.2, 2.0, colore );
-	// return set;
+/*
+float distFunct( vec3 pos) {
+	float cubo = sBox( pos, vec3(1.0, 2.0, 0.0) );
+	//float croce = sdCross( pos, vec2( 3.0, 0.25 ) );
 	
-	////// Singolo pennello
-	float penn = singoloPennello( pos, colore );
-	return penn;
+	//pos.y += 1.9;
+	//float piano = sdPlane( pos, vec4(0.0, 1.0, 0.0, +0.0) );
 	
-	////// Cometa
-	// pos.y = max( pos.y, -2.5 );
-	// pos.y = min( pos.y, 1.0 );
-	// pos.xz = rotate( pos.xz, 0.005 * time );
-	// pos.y = repeat(pos.y, 2.5 );
-	// pos.z += 1.0;
-	// float penn = pennello( pos, colore );
-	// return penn;
+	return cubo;
+}
+*/
+
+float distFunct( vec3 pos ) {
+
+	//float c = pModPolar(pos.yz, 5);
 	
-	////// Fila indiana
-	// pos.y = max( pos.y, -2.5 );
-	// pos.xz = rotate( pos.xz, 0.005 * time );
-	// pos.y = repeat(pos.y, 2.5 );
-	// pos.z += 1.0;
-	// float penn = pennello( pos, colore );
-	// return penn;
+	//pos = min(pos, -vec3(1.0, 0.15, 0.15) );
+	//pos.xyz = mod(pos.xyz, 1.25) - 1.25 * 0.5;
+	pos.y = mod(pos.y, 1.25) - 1.25 * .5;
+	pos = repeatAngS(pos.yz, 5);
+	//pos *= vec3( 1.5, 1.0, 0.0 );
+	float cubo = sBox( pos, vec3(0.15) );
 	
-	////// Cespugli rotanti
-	// float penn;
-	// // float s = 0.025;
-	// // pos = pos-mod(pos-s/2.0,s);
-	// float d=sin(length(pos/2.0)*1.0-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*0.5+0.5);
-	// pos.xz = sim2d(pos.xz, 2.5 );
-	// pos.xz = rotate( pos.xz, 1.4 * d );
-	// penn = singoloPennello( pos, colore );
-	// return penn;
-	
-	// float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
-	// pos.y = max( pos.y, -2.5 );
-	// pos.xz = rotate( pos.xz, 0.5 * d );
-	// pos.y = repeat(pos.y, 2.5 );
-	// pos.z += 1.0;
-	// float penn = pennello( pos, colore );
-	// return penn;
+	return cubo;
 }
 
 
+float scene(vec3 p)
+{
+	float d, d1, d2, d3, f, e = 0.15;
+	float tt = time * 0.01;
+	
+	vec3 q = p;
+	q.xy = rotate(q.xy, 1.5);
+	
+	// center sphere
+	d1 = sdSphere(q, 0.3);
+	d = d1; 
+    vec3 col = sphere_col; 
+    
+	// tentacles
+	float r = length(q);
+	float a = atan(q.z, q.x);
+	a += 0.4*sin(r-tt);
+	
+	q = vec3(a*float(NUM_TENTACLES)/(PI*2.0),q.y,length(q.xz)); // circular domain
+	q = vec3(mod(q.x,1.0)-0.5*1.0,q.y,q.z); // repetition
+	
+	d3 = sdCappedCylinder(q-vec3(0.0,0.0,0.9+bite), vec2(0.1-(r-bite)/18.0,0.8));
+	d2 = min(d3, sBox(q-vec3(0.0, 0.0, 0.1+bite), vec3(0.2, 0.2, 0.2))); // close box
+	d2 = smin(d2, sBox(q-vec3(0.0, 0.0, 0.4+bite), vec3(0.2, 0.05, 0.4)), 0.1); // wide box
+	
+    f = smoothstep(0.11, 0.28, d2-d1);
+	col = mix(MOUTH_COL, col, f);
+	e = mix(e, 0.0, f);
+	d = smin(d1, d2, 0.24);
+    
+	col = mix(TENTACLE_COL, col, smoothstep(0., 0.48, d3-d));
+	
+	#ifdef BACKGROUND
+	q = p;
+	q.yz = mod(q.yz, 1.0);
+	q -= vec3(-.6, 0.5, 0.5);
+	d1 = sBox(q, vec3(0.1, 0.48, 0.48));
+	if (d1 < d) { d = d1; col = vec3(0.1); }
+	#endif
+	
+	return d;
+}
 
 
-void main() {
+void main()
+{
 	
-	vec2 resolution = vec2( res_x, res_y );
-	vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
-	float t = time * 0.2;
+	// Coordinate (x,y) che variano tra -1.0 e 1.0, come al solito
+	vec2 pixelPos = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
+	pixelPos.x *= resolution.x / resolution.y;
+	float t = time * 0.002;
 	
-	vec3 cameraTar = vec3(0.0);
-	vec3 cameraOrigin = vec3(6.0) * cameraTrg;
-	
-	vec3 cameraDir	= normalize( cameraTar - cameraOrigin );
-	//vec3 cameraDir    = normalize( cameraTrg - cameraOrg );
-	vec3 cameraRight  = normalize( cross( cameraDir, -cameraUpd ) );
-	vec3 cameraUp     = normalize( cross( cameraRight, -cameraDir ) );
+	vec3 spaceUpDir   = cameraUpd;
+	vec3 cameraOrigin = cameraOrg;
+	vec3 cameraTarget = cameraTrg;
+	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
+	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
+	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
 	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
+	
 	float totalDist = 0.0;
-	//vec3 pos = cameraOrg;
 	vec3 pos = cameraOrigin;
 	float dist = EPSILON;
 	
-	vec3 ccc;
-	vec3 dummy;
-	bool rayMiss = false;
-	
 	// Raymarch loop
 	for ( int i = 0; i < MAX_ITER; i++ ) {
-		if (dist < EPSILON)
-        	break;
-		if ( totalDist > MAX_DIST ) {
-			rayMiss = true;
-			break;
-		}
-		dist = distFunct(pos, ccc);
-		totalDist += dist * 0.1;
+		if (dist < EPSILON|| totalDist > MAX_DIST)
+        		break;
+		//dist = distFunct(pos);
+		dist = scene( pos );
+		totalDist += dist;
 		pos += dist * rayDir;
 	}
 	
-	// bersaglio mancato!
-	/*if (rayMiss) {
-		//color = vec4( 0.5, 0.2, 0.3, 1.0);
-		color = vec4( GetSky( vec3(-rayDir.y, rayDir.xz )), 1.0 );
-		return;
-	}*/
-		
+	// calcolo illuminazione: arrivati qui abbiamo distanza percorsa; se > MAX_DIST raggio non ha intersecato
+	// la superficie, altrimenti calcolo normale alla superficie in quel punto (campiono superficie nell'intorno
+	// del punto trovato per ricavare tre componenti della normale) con cui posso calcolare le componenti
+	// di riflessione e diffusione.
 	vec2 eps = vec2(0.0, EPSILON);
 	vec3 normal = normalize(vec3(
-		distFunct(pos + eps.yxx, dummy) - distFunct(pos - eps.yxx, dummy),
-		distFunct(pos + eps.xyx, dummy) - distFunct(pos - eps.xyx, dummy),
-		distFunct(pos + eps.xxy, dummy) - distFunct(pos - eps.xxy, dummy)));
-	float diffuse = max(0.35, dot(-rayDir, normal));
-	float specular = pow( diffuse, 16.0 );
+		distFunct(pos + eps.yxx) - distFunct(pos - eps.yxx),
+		distFunct(pos + eps.xyx) - distFunct(pos - eps.xyx),
+		distFunct(pos + eps.xxy) - distFunct(pos - eps.xxy)));
 	
+	// Diffuse lighting: prodotto scalare tra -rayDir e normale (non deve essere minore di 0)
+	float diffuse = max(0.0, dot(-rayDir, normal));
+	
+	// Specular lighting: diffuse elevato ad una potenza "grande"
+	float specular = pow( diffuse, 32.0 );
+	
+	// colore finale =  somma delle componenti di diffusione e riflessione
+	float colour = diffuse + specular;
+
 	float lenPos = length(pos);
-	
-	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
-	//vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
-    //vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
-	//vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
-	//color = vec4( colour, 1.0 );
-	
-	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
-	
-	// vec3 ff = cubemap( tex, pos ) * 3.0;
-	//color = vec4( ccc * 2.0, 1.0 );
-	color = vec4( vec3((diffuse + specular)/(lenPos * 0.3)) * ccc, 1.0 );
-	//color = vec4( (vec3(1.0/totalDist) + vec3((diffuse + specular)/lenPos)) * ccc, 1.0 );
-	
-	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );
-	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
-	// ^^^ usare una di queste due per mostrare le geometrie
+	// finta occlusion map: dividere per potenze di lenPos
+	color = vec4( vec3( colour/(lenPos*lenPos), colour*0.5 / (lenPos*lenPos), colour*0.9/lenPos ), 1.0 );
+	//color = vec4( shdw, shdw * 0.5, shdw * 0.9, 1.0 );
 	
 }

@@ -21,12 +21,15 @@ bool	SaraGlobal::windowResize = false;
 bool	SaraGlobal::postProcess = false;
 bool	SaraGlobal::cameraMoving = false;
 bool	SaraGlobal::cameraStartMoving = true;
+bool	SaraGlobal::cameraForward = false;
+bool	SaraGlobal::cameraBackward = false;
+bool	SaraGlobal::cameraStrafeLeft = false;
+bool	SaraGlobal::cameraStrafeRight = false;
 float	SaraGlobal::angle[2] = { 0.0f, 0.0f };
 double	SaraGlobal::startX = 0.0;
 double	SaraGlobal::startY = 0.0;
 int		SaraGlobal::shaderNumber = 0;
 float	SaraGlobal::postProcVar = 0.75;
-
 
 int main( void ) {
 
@@ -68,7 +71,6 @@ int main( void ) {
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_grad2D.frag" ) );
 	SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_rembrant.frag" ) );
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_twister3.frag" ) );
-
 
 	SaraCamera mainCamera;
 

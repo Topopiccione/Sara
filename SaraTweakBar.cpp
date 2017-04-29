@@ -28,9 +28,9 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 	//	" label='Camera direction' opened=true help='Cambia punto di vista' " );
 	//TwAddButton( bar, "Post Process", NULL, &global_postProcess, "label='Post Process'" );
 
-	TwAddVarRO( bar, "angleX", TW_TYPE_FLOAT, &SaraGlobal::angle[0], " label='global angleX' " );
-	TwAddVarRO( bar, "angleY", TW_TYPE_FLOAT, &SaraGlobal::angle[1], " label='global angleY' " );
-	TwAddSeparator( bar, NULL, NULL );
+	//TwAddVarRO( bar, "angleX", TW_TYPE_FLOAT, &SaraGlobal::angle[0], " label='global angleX' " );
+	//TwAddVarRO( bar, "angleY", TW_TYPE_FLOAT, &SaraGlobal::angle[1], " label='global angleY' " );
+	//TwAddSeparator( bar, NULL, NULL );
 
 	TwAddVarRW( bar, "Shader", shadNames, &SaraGlobal::shaderNumber, " label='Fragment shader' " );
 	TwAddSeparator( bar, NULL, NULL );
@@ -38,7 +38,7 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 	TwAddVarRW( bar, "Postproc", TW_TYPE_BOOLCPP, &SaraGlobal::postProcess, " label='Post Process' " );
 	TwAddVarRW( bar, "postProcVar", TW_TYPE_FLOAT, &SaraGlobal::postProcVar, " label='PostProc Var' " );
 	TwDefine( " SaraParams/postProcVar  step=0.05 " );
-
+	TwAddSeparator( bar, NULL, NULL );
 }
 
 

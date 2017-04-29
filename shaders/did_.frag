@@ -14,24 +14,24 @@ uniform sampler2D tex;
 const int MAX_ITER = 128;
 const float MAX_DIST = 35.0;
 const float EPSILON  = 0.001;
-const float fieldOfView = 1.0;
-const float zoom = 0.25;
+const float fieldOfView = 0.5;
+const float zoom = 0.5;
 
 
 vec3 cubemap( sampler2D sam, in vec3 d ) {
     vec3 n = abs(d);
-#if 1
+//#if 0
     // sort components (small to big)    
     float mi = min(min(n.x,n.y),n.z);
     float ma = max(max(n.x,n.y),n.z);
     vec3 o = vec3( mi, n.x+n.y+n.z-mi-ma, ma );
     return texture2D( sam, abs(0.8*o.xy/o.z) ).xyz;
-#else
+//#else
    vec2 uuv = (n.x>n.y && n.x>n.z) ? d.yz/d.x: 
               (n.y>n.x && n.y>n.z) ? d.zx/d.y:
                                      d.xy/d.z;
     return texture( sam, uuv ).xyz;
-#endif    
+//#endif    
 }
 
 
@@ -118,7 +118,7 @@ float pennello( in vec3 pos, out vec3 colore ) {
 	pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
 	pos.xz = repeatAng( pos.xz, 13 );
 	pos.yz = rotate( pos.yz, 0.1 );
-	colore = cubemap( tex, 0.1*pos + vec3(-1.0, 0.30, 0.15) );
+	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
 	pos.y -= 0.6 * abs(pos.z);
 	pos.z = max( pos.z, -2.0 );
 	pos.z = min( pos.z, 2.0 );
@@ -128,13 +128,14 @@ float pennello( in vec3 pos, out vec3 colore ) {
 
 float singoloPennello( vec3 pos, out vec3 colore ) {
 	//pos.xz = rotate(pos.xz, -length(pos.xy) * 0.5);
+	//pos.xz = rotate(pos.xz, -length(pos.xy)*0.2*cos(time * 0.025));
 	colore = cubemap( tex, pos + vec3(0.51, 0.0, 0.0) );
 	pos.xz = repeatAng( pos.xz, 13 );
 	pos.yz = rotate( pos.yz, 0.1 );
-	pos.y -= 0.6 * abs(pos.z);
+	pos.y -= 0.7 * abs(pos.z);
 	pos.z = max( pos.z, -2.0 );
-	pos.z = min( pos.z, 2.1 );
-	pos.z = repeat( pos.z, 0.2332 );
+	pos.z = min( pos.z, 2.0 );
+	pos.z = repeat( pos.z, 0.2 );
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
 
@@ -166,19 +167,17 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	////// Singolo cilindro
 	// pos.x = repeat( pos.x, 1.2 );
 	// pos.z = repeat( pos.z, 0.7 );
-	// //float set = setola( pos, 0.2, 2.0 ); // Variante senza texture
 	// float set = setola( pos, 0.2, 2.0, colore );
 	// return set;
-	// return set + cisti( pos, time, 20.0, 0.04 );
 	
 	////// Singolo pennello
-	// float penn = singoloPennello( pos, colore );
-	// return penn;
+	float penn = singoloPennello( pos, colore );
+	return penn;
 	
-	//// Cometa
+	////// Cometa
 	// pos.y = max( pos.y, -2.5 );
 	// pos.y = min( pos.y, 1.0 );
-	// //pos.xz = rotate( pos.xz, 0.005 * time );
+	// pos.xz = rotate( pos.xz, 0.005 * time );
 	// pos.y = repeat(pos.y, 2.5 );
 	// pos.z += 1.0;
 	// float penn = pennello( pos, colore );
@@ -202,21 +201,16 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	// penn = singoloPennello( pos, colore );
 	// return penn;
 	
-	//float d = -0.5 * length(pos / 3.0);  // Questo "arrotola" la fila
 	// float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
-	vec3 q = pos;	
-	float fatt = length( pos / 5.0 ) * 1.5;
-	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 0.5;	
-	q.xz = rotate(q.xz, 0.01 * length(q.xz) + sin(time * 0.002) * 1.5);
-	q.xy = rotate(q.xy, 0.005 * length(q.xy) - sin(time * 0.001) * 3.0);
-	q.y = max( q.y, -0.0 );
-	q.y = min( q.y, 150.0 );
-	q.xz = rotate( q.xz, 0.5 * d );
-	q.y = repeat( q.y, 2.5 );
-	float penn = pennello( q, colore );
-	float bb = sBox( q, vec3(1.0) );
-	return penn;
+	// pos.y = max( pos.y, -2.5 );
+	// pos.xz = rotate( pos.xz, 0.5 * d );
+	// pos.y = repeat(pos.y, 2.5 );
+	// pos.z += 1.0;
+	// float penn = pennello( pos, colore );
+	// return penn;
 }
+
+
 
 
 void main() {
@@ -225,15 +219,17 @@ void main() {
 	vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
 	float t = time * 0.2;
 	
-	vec3 spaceUpDir   = cameraUpd;
-	vec3 cameraOrigin = cameraOrg;
-	vec3 cameraTarget = cameraTrg;
-	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
-	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
-	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
+	vec3 cameraTar = vec3(0.0);
+	vec3 cameraOrigin = vec3(6.0) * cameraTrg;
+	
+	vec3 cameraDir	= normalize( cameraTar - cameraOrigin );
+	//vec3 cameraDir    = normalize( cameraTrg - cameraOrg );
+	vec3 cameraRight  = normalize( cross( cameraDir, -cameraUpd ) );
+	vec3 cameraUp     = normalize( cross( cameraRight, -cameraDir ) );
 	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
 	
 	float totalDist = 0.0;
+	//vec3 pos = cameraOrg;
 	vec3 pos = cameraOrigin;
 	float dist = EPSILON;
 	
@@ -255,11 +251,11 @@ void main() {
 	}
 	
 	// bersaglio mancato!
-	if (rayMiss) {
+	/*if (rayMiss) {
 		//color = vec4( 0.5, 0.2, 0.3, 1.0);
-		color = vec4( GetSky( vec3(-rayDir.y, rayDir.xz )), 1.0 ) * 1.333;
+		color = vec4( GetSky( vec3(-rayDir.y, rayDir.xz )), 1.0 );
 		return;
-	}
+	}*/
 		
 	vec2 eps = vec2(0.0, EPSILON);
 	vec3 normal = normalize(vec3(
@@ -280,8 +276,8 @@ void main() {
 	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
 	
 	// vec3 ff = cubemap( tex, pos ) * 3.0;
-	color = vec4( ccc * 2.0, 1.0 );
-	//color = vec4( vec3((diffuse + specular)/(lenPos * 0.3)) * ccc, 1.0 );
+	//color = vec4( ccc * 2.0, 1.0 );
+	color = vec4( vec3((diffuse + specular)/(lenPos * 0.3)) * ccc, 1.0 );
 	//color = vec4( (vec3(1.0/totalDist) + vec3((diffuse + specular)/lenPos)) * ccc, 1.0 );
 	
 	//color = vec4( vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos), 1.0 );

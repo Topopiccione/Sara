@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <AntTweakBar.h>
+#include <glm/vec3.hpp>
 
 #include "Sara.h"
 
