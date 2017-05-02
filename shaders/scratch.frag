@@ -145,22 +145,13 @@ vec3 GetSky(in vec3 rd) {
 	vec3 sunLight  = normalize( vec3( -0.75, 0.2, -0.6 ) );
 	vec3 sunColour = vec3(1.0, .75, .6);
 
-	float sunAmount = max( dot( rd, sunLight), 0.0 );
+	float sunAmount = max( dot( rd, sunLight), 0.5 );
 	float v = pow(1.0-max(rd.y,0.0),6.);
 	vec3  sky = mix(vec3(.1, .2, .3), vec3(.32, .32, .32), v);
 	sky = sky + sunColour * sunAmount * sunAmount * .25;
 	sky = sky + sunColour * min(pow(sunAmount, 800.0)*1.5, .3);
 	return clamp(sky, 0.0, 1.0);
 }
-
-
-vec2 sim2d(vec2 p,float s){
-   vec2 ret=p;
-   ret=p+s/2.0;
-   ret=fract(ret/s)*s-s/2.0;
-   return ret;
-}
-
 
 float distFunct( in vec3 pos, out vec3 colore ) {
 	////// Singolo cilindro
@@ -202,19 +193,16 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	// penn = singoloPennello( pos, colore );
 	// return penn;
 	
-	//float d = -0.5 * length(pos / 3.0);  // Questo "arrotola" la fila
-	// float d=sin(length(pos/2.0)*1.5-time*0.02)*(sin(length(pos/50.0)*4.0-time*0.01)*1.0+0.5);
 	vec3 q = pos;	
-	float fatt = length( pos / 5.0 ) * 1.5;
-	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 0.5;	
-	q.xz = rotate(q.xz, 0.01 * length(q.xz) + sin(time * 0.002) * 1.5);
-	q.xy = rotate(q.xy, 0.005 * length(q.xy) - sin(time * 0.001) * 3.0);
-	q.y = max( q.y, -0.0 );
+	float fatt = length( q / 5.0 ) * 0.5;
+	float d = sin( fatt - time * 0.02 ) * ( sin( fatt * 2.0 - time * 0.01 ) * 1.5 + 0.5 ) - fatt * 1.5;	
+	q.xy = rotate(q.xy, 0.04 * length(q.xy) * sin(time * 0.001) );
+	q.zy = rotate(q.zy, 0.002 * length(q.zy) * sin(time * 0.0075));
+	q.y = max( q.y, 0.0 );
 	q.y = min( q.y, 150.0 );
 	q.xz = rotate( q.xz, 0.5 * d );
 	q.y = repeat( q.y, 2.5 );
 	float penn = pennello( q, colore );
-	float bb = sBox( q, vec3(1.0) );
 	return penn;
 }
 
@@ -227,7 +215,9 @@ void main() {
 	
 	vec3 spaceUpDir   = cameraUpd;
 	vec3 cameraOrigin = cameraOrg;
-	vec3 cameraTarget = cameraTrg;
+	vec3 cameraTarget = cameraTrg * 3.0;
+	// Aggiungo movimento alla camera
+	cameraOrigin.xz -= rotate(cameraOrigin.xz, 22.5 * sin( t * 0.001 )) * 2.0; cameraOrigin -= vec3(0.0, 1.0, 0.0);
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
 	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
 	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
@@ -257,7 +247,7 @@ void main() {
 	// bersaglio mancato!
 	if (rayMiss) {
 		//color = vec4( 0.5, 0.2, 0.3, 1.0);
-		color = vec4( GetSky( vec3(-rayDir.y, rayDir.xz )), 1.0 ) * 1.333;
+		color = vec4( GetSky( vec3(-rayDir.y, rayDir.zx )), 1.0 ) * 1.8;
 		return;
 	}
 		
@@ -271,15 +261,12 @@ void main() {
 	
 	float lenPos = length(pos);
 	
-	//vec3 ff = texcube( tex, 0.1*vec3(pos.x,4.0*res_y-pos.y,pos.z), normal ).xyz;
-	//vec3 ff = texcube( tex, 0.1*pos, normal ).xyz;
-    //vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
-	//vec3 colour = vec3(0.5/totalDist) * ff * 2.5;
+	//vec3 ff = cubemap( tex, pos ) * 3.0;
+	//vec3 colour = (vec3(0.1/totalDist) + vec3((diffuse + specular)/lenPos)) * ff * 1.25;
+	//vec3 colour = vec3(0.5/totalDist) * ff * 0.5;
 	//color = vec4( colour, 1.0 );
 	
 	//color = vec4( texture(tex, gl_FragCoord.xy / resolution) );
-	
-	// vec3 ff = cubemap( tex, pos ) * 3.0;
 	color = vec4( ccc * 2.0, 1.0 );
 	//color = vec4( vec3((diffuse + specular)/(lenPos * 0.3)) * ccc, 1.0 );
 	//color = vec4( (vec3(1.0/totalDist) + vec3((diffuse + specular)/lenPos)) * ccc, 1.0 );
