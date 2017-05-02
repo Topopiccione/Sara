@@ -91,8 +91,8 @@ void SaraRenderer::fboDraw( void ) {
 	glBindProgramPipeline( postProcShd->getPipeline() );
 
 	glActiveTexture( GL_TEXTURE0 );
-	//glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
-	glBindTexture( GL_TEXTURE_2D, procTextureObjTex );
+	glBindTexture( GL_TEXTURE_2D, frameBufferObjTex );
+	//glBindTexture( GL_TEXTURE_2D, procTextureObjTex );
 
 	postProcShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, 0, SaraGlobal::postProcVar );
 

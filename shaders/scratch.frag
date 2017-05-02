@@ -17,6 +17,9 @@ const float EPSILON  = 0.001;
 const float fieldOfView = 1.0;
 const float zoom = 0.25;
 
+// livello di anti-aliasing
+// attivo se >= 2
+#define AA 2
 
 vec3 cubemap( sampler2D sam, in vec3 d ) {
     vec3 n = abs(d);
@@ -138,6 +141,9 @@ float singoloPennello( vec3 pos, out vec3 colore ) {
 	return setola( pos, 0.05, 2.0 );// + cisti( pos, time, 20.0, 0.008 );
 }
 
+float randNo( vec2 co ){
+	return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
 
 //// Background
 // da hills.frag
@@ -206,7 +212,87 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	return penn;
 }
 
+vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
+	vec3 spaceUpDir   = cameraUpd;
+	vec3 cameraOrigin = cameraOrg;
+	vec3 cameraTarget = cameraTrg * 3.0;
+	// Aggiungo movimento alla camera
+	cameraOrigin.xz -= rotate(cameraOrigin.xz, 22.5 * sin( t * 0.001 )) * 2.0; cameraOrigin -= vec3(0.0, 1.0, 0.0);
+	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
+	vec3 cameraRight  = normalize( cross( cameraDir, spaceUpDir ) );
+	vec3 cameraUp     = normalize( cross( cameraRight, cameraDir ) );
+	vec3 rayDir       = normalize( (cameraRight * pixelPos.x + cameraUp * pixelPos.y) * fieldOfView + cameraDir);
+	
+	float totalDist = 0.0;
+	vec3 pos = cameraOrigin;
+	float dist = EPSILON;
+	
+	vec3 ccc;
+	vec3 dummy;
+	bool rayMiss = false;
+	
+	// Raymarch loop
+	for ( int i = 0; i < MAX_ITER; i++ ) {
+		if (dist < EPSILON)
+        	break;
+		if ( totalDist > MAX_DIST ) {
+			rayMiss = true;
+			break;
+		}
+		dist = distFunct(pos, ccc);
+		totalDist += dist * 0.1;
+		pos += dist * rayDir;
+	}
+	
+	// bersaglio mancato!
+	if (rayMiss) {
+		//color = vec4( 0.5, 0.2, 0.3, 1.0);
+		color = vec4( GetSky( vec3(-rayDir.y, rayDir.zx )), 1.0 ) * 1.8;
+		//return color;
+	} else {
+		vec2 eps = vec2(0.0, EPSILON);
+		vec3 normal = normalize(vec3(
+			distFunct(pos + eps.yxx, dummy) - distFunct(pos - eps.yxx, dummy),
+			distFunct(pos + eps.xyx, dummy) - distFunct(pos - eps.xyx, dummy),
+			distFunct(pos + eps.xxy, dummy) - distFunct(pos - eps.xxy, dummy)));
+		float diffuse = max(0.35, dot(-rayDir, normal));
+		float specular = pow( diffuse, 16.0 );
+		
+		float lenPos = length(pos);
+		
+		color = vec4( ccc * 2.0, 1.0 );
+	}
+	return color;
+}
 
+void main( void ) {
+	
+	vec2 resolution = vec2( res_x, res_y );
+	float t = time * 0.2;
+	vec4 col = vec4(0.0);
+
+#if AA > 1
+	float r = randNo( gl_FragCoord.xy / resolution );
+
+    for( int j=0; j<AA; j++ )
+		for( int i=0; i<AA; i++ ) {
+			vec2 pixelPos = ( -1.0 + 2.0 * (gl_FragCoord.xy+vec2(i,j)/float(AA)) / resolution.xy ) * resolution.x / resolution.y;
+			float t = time * 0.2 + (float(AA*j + i))/float(AA*AA) * (0.4/30.0);
+        
+			col += render( pixelPos, resolution, t + r*0.5 );
+		}
+    col /= float(AA*AA);
+	color = col;
+#else
+	vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
+	color = render(pixelPos, resolution, t );
+#endif
+
+}
+
+
+
+/*
 void main() {
 	
 	vec2 resolution = vec2( res_x, res_y );
@@ -275,4 +361,4 @@ void main() {
 	//color = vec4( vec3((diffuse + specular)/lenPos), 1.0 );
 	// ^^^ usare una di queste due per mostrare le geometrie
 	
-}
+}*/

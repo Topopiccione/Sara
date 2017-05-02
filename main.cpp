@@ -65,7 +65,8 @@ int main( void ) {
 	SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), shaderNames );
 	//SaraShaderManager mainShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), shaderNames );
 
-	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
+	//SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\crossHatch.frag" ) );
+	SaraShaderManager postProcShader( SHDPATH + std::string( "shaders\\crossHatch.vert" ), SHDPATH + std::string( "shaders\\postProcess.frag" ) );
 
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_voronoi.frag" ) );
 	//SaraShaderManager procTexShader( SHDPATH + std::string( "shaders\\mainOut.vert" ), SHDPATH + std::string( "shaders\\procTexture_grad2D.frag" ) );
