@@ -39,6 +39,10 @@ SaraTweakBar::SaraTweakBar( std::string name ) {
 	TwAddVarRW( bar, "postProcVar", TW_TYPE_FLOAT, &SaraGlobal::postProcVar, " label='PostProc Var' " );
 	TwDefine( " SaraParams/postProcVar  step=0.05 " );
 	TwAddSeparator( bar, NULL, NULL );
+
+	TwAddVarRW( bar, "AntiAliasingLevel", TW_TYPE_INT32, &SaraGlobal::antiAliasingLevel, " min=1 max=4 label='Anti-Aliasing Level' " );
+	TwAddSeparator( bar, NULL, NULL );
+
 }
 
 

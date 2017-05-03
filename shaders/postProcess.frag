@@ -21,18 +21,8 @@ void main( void ) {
 	
 	vec2 position = (gl_FragCoord.xy / vec2(res_x, res_y)) - vec2(0.5);
 	float r = length(position);
-	
-// Lens
-	/*vec2 tc = gl_FragCoord.xy / vec2( res_x, res_y );
-	vec2 normCoord = 2.0 * tc - 1.0;
-	float rr = length( normCoord );
-	float phi = atan( normCoord.y, normCoord.x );
-	rr = pow(rr, 1.0/0.85) / 0.85;
-	vec2 nnCoord = vec2( rr * cos(phi), rr * sin(phi) ) / 2.0 + 0.5;;
-	texColor = texture2D( tex, nnCoord );*/
-	
+
 // Vignette
-	
 	float vign = smoothstep( 0.8, 3.4, 1/r );
 	//color = vec4(vign);
 	color = mix(texColor, texColor * vign, 0.5);

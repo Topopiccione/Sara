@@ -14,8 +14,8 @@
 #define SHDPATH "C:\\Users\\User\\Documents\\git\\Sara\\"
 //#define SHDPATH ""
 
-int		SaraGlobal::xRes = 640;
-int		SaraGlobal::yRes = 480;
+int		SaraGlobal::xRes = 800;
+int		SaraGlobal::yRes = 600;
 bool	SaraGlobal::recompileShader = false;
 bool	SaraGlobal::windowResize = false;
 bool	SaraGlobal::postProcess = false;
@@ -30,6 +30,7 @@ double	SaraGlobal::startX = 0.0;
 double	SaraGlobal::startY = 0.0;
 int		SaraGlobal::shaderNumber = 0;
 float	SaraGlobal::postProcVar = 0.75;
+int		SaraGlobal::antiAliasingLevel = 1;
 
 int main( void ) {
 

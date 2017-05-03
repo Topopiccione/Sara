@@ -23,7 +23,7 @@ public:
 
 	void	setUniforms( int resX, int resY, float time );
 	void	setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd );
-	void	setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd, int tex );
+	void	setUniforms( int resX, int resY, float time, glm::vec3 camOrg, glm::vec3 camTrg, glm::vec3 camUpd, int tex, int aaLev );
 	void	setUniforms( int resX, int resY, float time, int tex, float offc );
 
 
@@ -53,6 +53,7 @@ private:
 	GLuint					tex_loc;
 	GLuint					offc_loc;
 	GLuint					angle_loc;
+	GLuint					aa_loc;
 
 	GLuint					cameraOrg_loc;
 	GLuint					cameraTrg_loc;

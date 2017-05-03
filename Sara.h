@@ -11,6 +11,7 @@ namespace SaraGlobal {
 	extern double	startY;
 	extern int		shaderNumber;
 	extern float	postProcVar;
+	extern int		antiAliasingLevel;
 	// events
 	extern bool		recompileShader;
 	extern bool		windowResize;

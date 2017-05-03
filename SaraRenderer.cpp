@@ -62,7 +62,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 	glBindTexture( GL_TEXTURE_2D, procTextureObjTex );
 
 	//mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t );
-	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct, 0 );
+	mainShd->setUniforms( SaraGlobal::xRes, SaraGlobal::yRes, t, came->origin, came->target, came->upDrct, 0, SaraGlobal::antiAliasingLevel );
 
 	glBindVertexArray( vao );
 		glDrawArrays( GL_QUADS, 0, 4 );

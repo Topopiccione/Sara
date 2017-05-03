@@ -10,16 +10,15 @@ uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
 uniform sampler2D tex;
+uniform int aaLevel;
 
 const int MAX_ITER = 128;
-const float MAX_DIST = 35.0;
+const float MAX_DIST = 135.0;
 const float EPSILON  = 0.001;
 const float fieldOfView = 1.0;
-const float zoom = 0.25;
 
 // livello di anti-aliasing
 // attivo se >= 2
-#define AA 2
 
 vec3 cubemap( sampler2D sam, in vec3 d ) {
     vec3 n = abs(d);
@@ -205,7 +204,7 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 	q.xy = rotate(q.xy, 0.04 * length(q.xy) * sin(time * 0.001) );
 	q.zy = rotate(q.zy, 0.002 * length(q.zy) * sin(time * 0.0075));
 	q.y = max( q.y, 0.0 );
-	q.y = min( q.y, 150.0 );
+	q.y = min( q.y, 100.0 );
 	q.xz = rotate( q.xz, 0.5 * d );
 	q.y = repeat( q.y, 2.5 );
 	float penn = pennello( q, colore );
@@ -240,7 +239,7 @@ vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
 			break;
 		}
 		dist = distFunct(pos, ccc);
-		totalDist += dist * 0.1;
+		totalDist += dist;
 		pos += dist * rayDir;
 	}
 	
@@ -271,22 +270,23 @@ void main( void ) {
 	float t = time * 0.2;
 	vec4 col = vec4(0.0);
 
-#if AA > 1
-	float r = randNo( gl_FragCoord.xy / resolution );
+	if (aaLevel > 1) {
+		float r = randNo( gl_FragCoord.xy / resolution );
 
-    for( int j=0; j<AA; j++ )
-		for( int i=0; i<AA; i++ ) {
-			vec2 pixelPos = ( -1.0 + 2.0 * (gl_FragCoord.xy+vec2(i,j)/float(AA)) / resolution.xy ) * resolution.x / resolution.y;
-			float t = time * 0.2 + (float(AA*j + i))/float(AA*AA) * (0.4/30.0);
-        
-			col += render( pixelPos, resolution, t + r*0.5 );
-		}
-    col /= float(AA*AA);
-	color = col;
-#else
-	vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
-	color = render(pixelPos, resolution, t );
-#endif
+		for( int j = 0; j < aaLevel; j++ )
+			for( int i = 0; i < aaLevel; i++ ) {
+				vec2 pixelPos = ( -1.0 + 2.0 * (gl_FragCoord.xy+vec2(i,j)/float(aaLevel)) / resolution.xy ) * resolution.x / resolution.y;
+				float t = time * 0.2 + (float(aaLevel*j + i))/float(aaLevel*aaLevel) * (0.4/30.0);
+			
+				col += render( pixelPos, resolution, t + r*0.5 );
+			}
+		col /= float(aaLevel*aaLevel);
+		color = col;
+	} else {
+		vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
+		color = render(pixelPos, resolution, t );
+	}
+
 
 }
 
