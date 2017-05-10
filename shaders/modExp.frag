@@ -9,6 +9,8 @@ uniform float time;
 uniform vec3 cameraOrg;
 uniform vec3 cameraTrg;
 uniform vec3 cameraUpd;
+uniform int aaLevel;
+
 
 const int MAX_ITER = 100;
 const float MAX_DIST = 25.0;
@@ -105,14 +107,11 @@ float shadow( vec3 p, vec3 l, float r, float d, float i ) {
 }
 
 
-void main()
-{
-	
-	// Coordinate (x,y) che variano tra -1.0 e 1.0, come al solito
-	vec2 pixelPos = -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy;
-	pixelPos.x *= resolution.x / resolution.y;
-	float t = time * 0.002;
-	
+float randNo( vec2 co ){
+	return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
 	vec3 spaceUpDir   = cameraUpd;
 	vec3 cameraOrigin = cameraOrg;
 	vec3 cameraTarget = cameraTrg;
@@ -182,7 +181,33 @@ void main()
 	*/
 
 	// finta occlusion map: dividere per potenze di lenPos
-	color = vec4( vec3( colour/(lenPos*lenPos), colour*0.5 / (lenPos*lenPos), colour*0.9/lenPos ), 1.0 );
+	return vec4( vec3( colour/(lenPos*lenPos), colour*0.5 / (lenPos*lenPos), colour*0.9/lenPos ), 1.0 );
 	//color = vec4( shdw, shdw * 0.5, shdw * 0.9, 1.0 );
+
+}
+
+
+
+void main() {
+	
+	float t = time * 0.2;
+	vec4 col = vec4(0.0);
+
+	if (aaLevel > 1) {
+		float r = randNo( gl_FragCoord.xy / resolution );
+
+		for( int j = 0; j < aaLevel; j++ ) 
+			for( int i = 0; i < aaLevel; i++ ) {
+				vec2 pixelPos = ( -1.0 + 2.0 * (gl_FragCoord.xy+vec2(i,j)/float(aaLevel)) / resolution.xy ) * resolution.x / resolution.y;
+				float t = time * 0.2 + (float(aaLevel*j + i))/float(aaLevel*aaLevel) * (0.4/30.0);
+			
+				col += render( pixelPos, resolution, t /*+ r*0.5*/ );
+			}
+		col /= float(aaLevel*aaLevel);
+		color = col;
+	} else {
+		vec2 pixelPos = ( -1.0 + 2.0 * gl_FragCoord.xy / resolution.xy ) * resolution.x / resolution.y;
+		color = render(pixelPos, resolution, t );
+	}
 	
 }
