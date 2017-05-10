@@ -15,8 +15,6 @@ public:
 	glm::vec3 target;
 	glm::vec3 upDrct;
 
-	glm::quat orientation;
-
 	void update();
 	void updatePosition();
 

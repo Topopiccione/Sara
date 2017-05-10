@@ -17,6 +17,8 @@ const float MAX_DIST = 135.0;
 const float EPSILON  = 0.001;
 const float fieldOfView = 1.0;
 
+//float time = 350.0;
+
 // livello di anti-aliasing
 // attivo se >= 2
 
@@ -212,9 +214,10 @@ float distFunct( in vec3 pos, out vec3 colore ) {
 }
 
 vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
-	vec3 spaceUpDir   = cameraUpd;
-	vec3 cameraOrigin = cameraOrg;
-	vec3 cameraTarget = cameraTrg * 3.0;
+	// Controlli manuali disabilitati!!!!
+	vec3 spaceUpDir   = vec3(0.0, 0.0, 1.0); //cameraUpd;
+	vec3 cameraOrigin = vec3(1.0, 0.0, 0.0); //cameraOrg;
+	vec3 cameraTarget = vec3(0.0, 3.0, 0.0); //cameraTrg * 3.0;
 	// Aggiungo movimento alla camera
 	cameraOrigin.xz -= rotate(cameraOrigin.xz, 22.5 * sin( t * 0.001 )) * 2.0; cameraOrigin -= vec3(0.0, 1.0, 0.0);
 	vec3 cameraDir    = normalize( cameraTarget - cameraOrigin );
@@ -249,7 +252,7 @@ vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
 		color = vec4( GetSky( vec3(-rayDir.y, rayDir.zx )), 1.0 ) * 1.8;
 		//return color;
 	} else {
-		vec2 eps = vec2(0.0, EPSILON);
+		/*vec2 eps = vec2(0.0, EPSILON);
 		vec3 normal = normalize(vec3(
 			distFunct(pos + eps.yxx, dummy) - distFunct(pos - eps.yxx, dummy),
 			distFunct(pos + eps.xyx, dummy) - distFunct(pos - eps.xyx, dummy),
@@ -257,7 +260,7 @@ vec4 render( vec2 pixelPos, vec2 resoluiton, float t ) {
 		float diffuse = max(0.35, dot(-rayDir, normal));
 		float specular = pow( diffuse, 16.0 );
 		
-		float lenPos = length(pos);
+		float lenPos = length(pos);*/
 		
 		color = vec4( ccc * 2.0, 1.0 );
 	}
@@ -273,12 +276,12 @@ void main( void ) {
 	if (aaLevel > 1) {
 		float r = randNo( gl_FragCoord.xy / resolution );
 
-		for( int j = 0; j < aaLevel; j++ )
+		for( int j = 0; j < aaLevel; j++ ) 
 			for( int i = 0; i < aaLevel; i++ ) {
 				vec2 pixelPos = ( -1.0 + 2.0 * (gl_FragCoord.xy+vec2(i,j)/float(aaLevel)) / resolution.xy ) * resolution.x / resolution.y;
 				float t = time * 0.2 + (float(aaLevel*j + i))/float(aaLevel*aaLevel) * (0.4/30.0);
 			
-				col += render( pixelPos, resolution, t + r*0.5 );
+				col += render( pixelPos, resolution, t /*+ r*0.5*/ );
 			}
 		col /= float(aaLevel*aaLevel);
 		color = col;

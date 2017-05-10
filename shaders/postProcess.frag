@@ -23,9 +23,10 @@ void main( void ) {
 	float r = length(position);
 
 // Vignette
-	float vign = smoothstep( 0.8, 3.4, 1/r );
+	float vign = smoothstep( 0.6, 3.4, 1/r );
 	//color = vec4(vign);
-	color = mix(texColor, texColor * vign, 0.5);
+	//color = mix(texColor, texColor * vign, 0.5);
+	color = texColor * vign;
 	
 	
 	

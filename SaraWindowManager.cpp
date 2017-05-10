@@ -23,7 +23,7 @@ SaraWindowManager::SaraWindowManager( int xSize, int ySize ) :
 			x( xSize ),
 			y( ySize ) {
 	
-	//glfwWindowHint( GLFW_SAMPLES, 4 );		// 4x antialiasing
+	//glfwWindowHint( GLFW_SAMPLES, 4 );		// 4x antialiasing che non funziona
 
 	window = glfwCreateWindow( x, y, "Sara - Main window", NULL, NULL );
 	if (!window) {

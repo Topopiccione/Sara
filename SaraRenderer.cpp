@@ -45,6 +45,12 @@ void SaraRenderer::update() {
 		came->update();
 	if (SaraGlobal::cameraBackward || SaraGlobal::cameraForward || SaraGlobal::cameraStrafeLeft || SaraGlobal::cameraStrafeRight)
 		came->updatePosition();
+	if (SaraGlobal::windowResize) {
+		twb.resize();
+		setupFBO( &frameBufferObj, &frameBufferObjTex, SaraGlobal::xRes, SaraGlobal::yRes );
+		//setupFBO( &procTextureObj, &procTextureObjTex );
+		SaraGlobal::windowResize = false;
+	}
 	t = static_cast<float>(std::clock() - start)  * 200 / (float)CLOCKS_PER_SEC;
 	mainShd->checkGlobalShd();
 }
@@ -74,13 +80,7 @@ void SaraRenderer::mainDraw( bool postProcess ) {
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 		fboDraw();
 	}
-
-	if (SaraGlobal::windowResize) {
-		twb.resize();
-		setupFBO( &frameBufferObj, &frameBufferObjTex, SaraGlobal::xRes, SaraGlobal::yRes );
-		//setupFBO( &procTextureObj, &procTextureObjTex );
-		SaraGlobal::windowResize = false;
-	}
+	
 	twb.draw();
 }
 

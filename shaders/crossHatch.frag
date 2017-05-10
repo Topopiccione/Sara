@@ -15,7 +15,7 @@ void main( void ) {
 	color = vec4( texture2D( tex, texCoord ).xyz, 1.0) * 1.5;
 }
 
-void main3(void)
+void main2(void)
 {
 	vec2 texCoord = gl_FragCoord.xy / vec2( res_x, res_y );
 	vec2 normCoord = 2.0 * texCoord - 1.0;
@@ -30,7 +30,7 @@ void main3(void)
 	color = vec4( texture2D( tex, texCoord ).xyz, 1.0);
 }
 
-void main2(void)
+void main3(void)
 {
 
 	float xx = gl_FragCoord.x;

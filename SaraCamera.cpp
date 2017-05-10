@@ -6,7 +6,6 @@ SaraCamera::SaraCamera() {
 	upDrct = { 0.0f, 0.0f, 1.0f };
 	camPitch = 0.0f;
 	camHeadn = 0.0f;
-	orientation = glm::quat( 0.0f, 0.0f, 0.0f, 1.0f );
 }
 
 SaraCamera::~SaraCamera() {}
